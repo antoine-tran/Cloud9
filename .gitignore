@@ -10,3 +10,6 @@ data/bible+shakes.nopunc.tuple2.packed
 test/*
 pom.xml.asc
 *~
+.classpath
+.project
+.settings
