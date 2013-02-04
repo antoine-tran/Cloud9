@@ -33,6 +33,11 @@
       <name>Jimmy Lin</name>
       <email>jimmylin@umd.edu</email>
     </developer>
+    <developer>
+      <id>antoine-tran</id>
+      <name>Tuan Tran</name>
+      <email>ttran@l3s.de</email>
+    </developer>
   </developers>
   
   <build>
@@ -71,7 +76,7 @@
                     			<source>src/dev</source>
                     			<source>src/integration</source>
                     			<source>src/dist</source>
-                    			<source>src/test</source>
+                                <source>src/attic</source>
                 			</sources>
             			</configuration>
         			</execution>
@@ -80,7 +85,8 @@
 					
 		</plugins>
 
-		<sourceDirectory>src/dist</sourceDirectory>		
+		<sourceDirectory>src/dist</sourceDirectory>	
+		<testSourceDirectory>src/test</testSourceDirectory>	
 		<outputDirectory>build</outputDirectory>		
 		<finalName>${articfactId}-${project.version}-SNAPSHOT</finalName>		
 	</build>
