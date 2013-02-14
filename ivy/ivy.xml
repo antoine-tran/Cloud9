@@ -30,7 +30,7 @@
     <dependency org="" name="dsiutils" rev="1.0.12" conf="*->*,!sources,!javadoc"/>
     <dependency org="fastutil" name="fastutil" rev="5.1.5" conf="*->*,!sources,!javadoc"/>
 
-    <dependency org="info.bliki.wiki" name="bliki-core" rev="3.0.16" conf="*->*,!sources,!javadoc">
+    <dependency org="info.bliki.wiki" name="bliki-core" rev="3.0.19" conf="*->*,!sources,!javadoc">
       <exclude org="commons-httpclient" module="commons-httpclient"/>
     </dependency>
     <dependency org="junit" name="junit" rev="4.8.2" conf="*->*,!sources,!javadoc"/>

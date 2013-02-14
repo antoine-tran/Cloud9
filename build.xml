@@ -250,11 +250,18 @@
     <ivy:makepom ivyfile="ivy/ivy.xml" pomfile="cloud9.pom" />
   </target>
 
-  <target name="publish-local" depends="jar" description="publish jar/source to maven repo mounted at ~/.m2/repository">
-    <ivy:publish resolver="local-m2-publish" forcedeliver="true" overwrite="true" publishivy="false">
+  <target name="publish-local-mac" depends="jar" description="publish jar/source to maven repo mounted at ~/.m2/repository">
+    <ivy:publish resolver="local-m2-publish-mac" forcedeliver="true" overwrite="true" publishivy="false">
       <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]"/>
       <artifacts pattern="pom.xml"/>
     </ivy:publish>
+  </target>
+	
+  <target name="publish-local-debian" depends="jar" description="publish jar/source to maven repo mounted at ~/.m2/repository">
+	<ivy:publish resolver="local-m2-publish-mac" forcedeliver="true" overwrite="true" publishivy="false">
+	  <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]"/>
+	  <artifacts pattern="pom.xml"/>
+	</ivy:publish>
   </target>
 
   <target name="deploy" depends="dist,install-maven" description="deploy to Nexus">

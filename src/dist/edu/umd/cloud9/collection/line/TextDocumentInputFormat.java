@@ -42,7 +42,7 @@ import org.apache.hadoop.mapred.Reporter;
  * @author Jimmy Lin
  */
 public class TextDocumentInputFormat extends FileInputFormat<LongWritable, TextDocument>
-		implements JobConfigurable {
+implements JobConfigurable {
 
 	private CompressionCodecFactory compressionCodecs = null;
 
@@ -55,22 +55,22 @@ public class TextDocumentInputFormat extends FileInputFormat<LongWritable, TextD
 	}
 
 	public RecordReader<LongWritable, TextDocument> getRecordReader(
-												InputSplit genericSplit, JobConf job,
-												Reporter reporter)
-			throws IOException {
+			InputSplit genericSplit, JobConf job,
+			Reporter reporter)
+					throws IOException {
 
 		reporter.setStatus(genericSplit.toString());
 		return new TextDocumentLineRecordReader(job, (FileSplit) genericSplit);
 	}
 
 	public static class TextDocumentLineRecordReader implements
-			RecordReader<LongWritable, TextDocument> {
+	RecordReader<LongWritable, TextDocument> {
 
 		private LineRecordReader mRecordReader;
 		private Text mText;
 
 		public TextDocumentLineRecordReader(Configuration job,
-					FileSplit split) throws IOException {
+				FileSplit split) throws IOException {
 			mRecordReader = new LineRecordReader(job, split);
 			mText = new Text();
 		}
@@ -91,12 +91,8 @@ public class TextDocumentInputFormat extends FileInputFormat<LongWritable, TextD
 			mRecordReader.getPos();
 		}
 
-		public float getProgress() {
-		    try{
+		public float getProgress() throws IOException {
 			return mRecordReader.getProgress();
-		    } catch (IOException e) {
-			return 0.0f;
-		    }
 		}
 
 		public synchronized boolean next(LongWritable key, TextDocument value) {

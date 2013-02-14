@@ -92,55 +92,55 @@
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-common</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-yarn-api</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-yarn-common</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-yarn-server-common</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-yarn-server-nodemanager</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-yarn-server-resourcemanager</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-hdfs</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-mapreduce-client-core</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-streaming</artifactId>
-			<version>2.0.0-cdh4.1.2</version>
+			<version>0.23.5</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -291,15 +291,6 @@
           <name>Spy Repository</name>
           <layout>default</layout>
           <url>http://bleu.west.spy.net/~dustin/m2repo/</url>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-		<repository>
-          <id>cloudera</id>
-          <name>Cloudera Repository</name>
-          <layout>default</layout>
-          <url>https://repository.cloudera.com/content/groups/cdh-releases-rcs/</url>
           <snapshots>
             <enabled>false</enabled>
           </snapshots>

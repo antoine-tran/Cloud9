@@ -17,8 +17,11 @@
       </filesystem>
 
       <!-- for *publishing* artifacts for local testing builds -->
-      <filesystem name="local-m2-publish" m2compatible="true">
-        <artifact pattern="${user.home}/.m2/repository/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
+      <filesystem name="local-m2-publish-debian" m2compatible="true">
+        <artifact pattern="${user.home}/Developer/maven-repo/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
+      </filesystem>
+      <filesystem name="local-m2-publish-mac" m2compatible="true">
+        <artifact pattern="${user.home}/Apps/maven-repo/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
       </filesystem>
 
     </chain>
