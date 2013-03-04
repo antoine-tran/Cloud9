@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.hadoop.io.WritableUtils;
 import edu.umd.cloud9.collection.Indexable;
+import edu.umd.cloud9.io.pair.Pair;
+import edu.umd.cloud9.io.pair.PairOfStrings;
 
 /**
  * A page from Wikipedia.
@@ -370,6 +372,63 @@ public abstract class WikipediaPage extends Indexable {
 
     return links;
   }
+  
+  /** 2013.03.04 (Tuan): Added method to extract both links and anchor texts */
+  public List<PairOfStrings> extractAnchoredLinks() {
+	    int start = 0;
+	    List<PairOfStrings> links = new ArrayList<PairOfStrings>();
+
+	    while (true) {
+	      start = page.indexOf("[[", start);
+
+	      if (start < 0)
+	        break;
+
+	      int end = page.indexOf("]]", start);
+
+	      if (end < 0)
+	        break;
+
+	      String text = page.substring(start + 2, end);
+	      String anchor = null;
+
+	      // skip empty links
+	      if (text.length() == 0) {
+	        start = end + 1;
+	        continue;
+	      }
+
+	      // skip special links
+	      if (text.indexOf(":") != -1) {
+	        start = end + 1;
+	        continue;
+	      }
+
+	      // get anchor text
+	      int a;
+	      if ((a = text.indexOf("|")) != -1) {
+	        text = text.substring(0, a);
+	        anchor = text.substring(a + 1);
+	      }
+
+	      if ((a = text.indexOf("#")) != -1) {
+	        text = text.substring(0, a);	        
+	      }
+
+	      // ignore article-internal links, e.g., [[#section|here]]
+	      if (text.length() == 0 ) {
+	        start = end + 1;
+	        continue;
+	      }
+	      text = text.trim();	      
+		  if (anchor == null) anchor = text;
+		  links.add(Pair.of(text, anchor));
+
+	      start = end + 1;
+	    }
+
+	    return links;
+	  }
 
   /**
    * Reads a raw XML string into a <code>WikipediaPage</code> object.

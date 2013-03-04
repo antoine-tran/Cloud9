@@ -55,14 +55,8 @@ import edu.umd.cloud9.io.pair.PairOfStringInt;
  * of times the destination article appears in the content of the source 
  * article.
  * <br>
- * Supported output formats are:
- * <ol>
- * 	<li>SQL dump</li>
- * 	<li>Plain-text file</li>
- * 	<li>Block-compressed sequential file</li>
- * </ol>
  * 
- * In any case, the graph is represented as adjacency lists, each single line
+ * The graph is represented as adjacency lists, each single line
  * contains a source node Id, list of its outgoing links with the weights. 
  * <br>
  * One sample invocation of this tool:<br>
