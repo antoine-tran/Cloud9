@@ -8,6 +8,8 @@ data/bible+shakes.nopunc.json.packed
 data/bible+shakes.nopunc.tuple1.packed
 data/bible+shakes.nopunc.tuple2.packed
 test/*
+/target/
+target/
 pom.xml.asc
 *~
 .classpath
