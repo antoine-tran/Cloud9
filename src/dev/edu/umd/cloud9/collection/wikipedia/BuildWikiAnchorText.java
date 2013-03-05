@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.io.pair.PairOfStringInt;
 import edu.umd.cloud9.io.pair.PairOfStrings;
+import edu.umd.cloud9.mapreduce.StructureMessageResolver;
 
 /**
  * A Hadoop job that extracts anchor text from Wikipedia dump
@@ -27,7 +28,7 @@ public class BuildWikiAnchorText extends Configured implements Tool {
 	private static final String REDUCE_NO = "reduce";
 	private static final String PHASE = "phase";
 
-	/** Map phase : Parse one single Wikipedia page and emits, for each outgoing 
+	/** Map phase 1: Parse one single Wikipedia page and emits, for each outgoing 
 	 * links in the text, a (destinationLink, anchor) pair */
 	private static final class EmitAnchorMapper extends
 	Mapper<LongWritable, WikipediaPage, Text, PairOfStringInt> {
@@ -92,6 +93,106 @@ public class BuildWikiAnchorText extends Configured implements Tool {
 		}		
 	}
 
+	
+	/** Reduce phase 1: Resolve the redirect links */
+	private static final class RedirectResolveReducer extends 
+			StructureMessageResolver<Text, PairOfStringInt, Text, PairOfStringInt> {
+
+		@Override
+		// Update the outkey on-the-fly
+		public boolean checkStructureMessage(Text key,
+				Text keySingletonToUpdate, PairOfStringInt msg) {
+			int v = msg.getValue();	
+			boolean redirected = (v == -1);
+			if (redirected) keySingletonToUpdate.set(msg.getKey());
+			else keySingletonToUpdate.set(key);
+			return redirected;
+		}
+
+		@Override
+		public PairOfStringInt clone(PairOfStringInt t) {
+			return new PairOfStringInt(t.getKey(), t.getValue());
+		}
+
+		@Override
+		public PairOfStringInt instantiateOutValueObject() {
+			return new PairOfStringInt();
+		}
+
+		@Override
+		public Text instantiateOutKeyObject() {
+			return new Text();
+		}
+
+		@Override
+		public void checkAndEmit(Context context, Text key, PairOfStringInt structureMsg, 
+				PairOfStringInt msg, Text keySingleton, PairOfStringInt valueSingleton) 
+				throws IOException, InterruptedException {
+			
+			// There might be still redirect pages that emit their pageIds. Ignore those
+			if ((key.toString().equals(msg.getKey()))) return;
+			
+			// no need to update the out key - we did it in checkStructureMessage() already
+			else context.write(keySingleton, msg);
+		}
+
+		@Override
+		// The destination page is not a redirect. Emit everything to the phase 2
+		public void noStructureMessageFound(Context context, Text key, 
+				Iterable<PairOfStringInt> cache, Text keySingleton, 
+				PairOfStringInt valueSingleton)	throws IOException, InterruptedException {
+			for (PairOfStringInt v : cache) context.write(keySingleton, v);
+		}
+	}
+	
+	private static final class PageIdResolveReducer 
+			extends StructureMessageResolver<Text, PairOfStringInt, Text, Text> {
+
+		@Override
+		// Update the output key on-the-fly
+		public boolean checkStructureMessage(Text key,
+				Text keySingletonToUpdate, PairOfStringInt msg) {
+			String dest = key.toString();
+			String source = msg.getKey(); 
+			boolean redirected = (dest.equals(source));
+			if (redirected) keySingletonToUpdate.set(String.valueOf(msg.getValue()));
+			else keySingletonToUpdate.set(key);
+			return redirected;
+		}
+
+		@Override
+		public PairOfStringInt clone(PairOfStringInt t) {
+			return new PairOfStringInt(t.getKey(), t.getValue());
+		}
+
+		@Override
+		public Text instantiateOutValueObject() {			
+			return new Text();
+		}
+
+		@Override
+		public Text instantiateOutKeyObject() {
+			return new Text();
+		}
+
+		@Override
+		public void checkAndEmit(Context context, Text key, PairOfStringInt structureMsg,
+				PairOfStringInt msg, Text keySingleton, Text valueSingleton) 
+				throws IOException, InterruptedException {
+			valueSingleton.set(msg.getKey() + "\t" + msg.getValue());
+			context.write(keySingleton, valueSingleton);
+		}
+
+		@Override
+		// We lost the structure message of this page. Report it !
+		public void noStructureMessageFound(Context context, Text key,
+				Iterable<PairOfStringInt> cache, Text keySingleton,	Text valueSingleton)
+				throws IOException, InterruptedException {
+			log.info("No structure message found for : " + key.toString());
+		}
+		
+	}
+	
 	@Override
 	public int run(String[] arg0) throws Exception {
 		// TODO Auto-generated method stub
