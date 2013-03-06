@@ -177,7 +177,7 @@ public class BuildWikipediaWeightedLinkGraph extends
 	Reducer<Text, PairOfStringInt, Text, PairOfStringInt> {
 
 		private PairOfStringInt newPair = new PairOfStringInt();
-
+ 
 		@Override
 		protected void reduce(Text key, Iterable<PairOfStringInt> values, 
 				Context context) throws IOException, InterruptedException {
