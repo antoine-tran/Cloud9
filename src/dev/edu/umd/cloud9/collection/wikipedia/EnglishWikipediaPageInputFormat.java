@@ -29,6 +29,7 @@ import edu.umd.cloud9.collection.XMLInputFormat.XMLRecordReader;
 import edu.umd.cloud9.collection.wikipedia.language.EnglishWikipediaPage;
 
 /**
+ * Adapted Wikipedia input format with new MapReduce API support
  * @author tuan
  *
  */

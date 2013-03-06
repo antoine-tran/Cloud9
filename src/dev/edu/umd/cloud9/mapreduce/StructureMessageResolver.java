@@ -1,9 +1,6 @@
 package edu.umd.cloud9.mapreduce;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.hadoop.mapreduce.Reducer;
 
 
@@ -11,6 +8,7 @@ import org.apache.hadoop.mapreduce.Reducer;
  * A Hadoop reducer that accepts both content messages and structure 
  * messages, and update the title of all content messages with the 
  * info from the structure message.
+ * @author tuan
  */ 
 public abstract class StructureMessageResolver<KEYIN, VALUEIN, KEYOUT, VALUEOUT> 
 		extends Reducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
@@ -26,36 +24,30 @@ public abstract class StructureMessageResolver<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
 		// along the iterator
 		VALUEIN smsg = null;
 		
-		// in-memory caches to emit content messages arriving before the 
-		// structure message
-		// TODO: Might use external-memory-based collection library (BerkeleyDB etc.)
-		// if the iterator is too big
-		List<VALUEIN> cache = new ArrayList<VALUEIN>();
-		VALUEIN tmpItem;
-
 		for (VALUEIN value : values) {
-			if (checkStructureMessage(key, keyOut, value)) {
-				smsg = value;
-			}			
+			if (checkStructureMessage(key, keyOut, value)) smsg = value;		
 
-			// items before the structure messages in the iterator will
+			// items before the structure message in the iterator will
 			// be copied and be emitted later
-			else if (smsg == null) {
-				tmpItem = clone(value);
-				cache.add(tmpItem);
-			}
+			else if (smsg == null) cacheMessagesBeforeHit(key, value);
+			
+			// items after the structure message will be checked and emitted
+			// immediately
 			else emit(context, key, smsg, value, keyOut, valueOut);
 		}
 
 		// No structure messages found
-		if (smsg == null) {
-			noHit(context, key, cache, keyOut, valueOut);
-		}
+		if (smsg == null) flushNoHit(context, key, keyOut, valueOut);
 				
 		// second run: update the remaining links with actual destination
-		else for (VALUEIN v : cache) {
-			emit(context, key, smsg, v, keyOut, valueOut);
-		}		
+		else {
+			Iterable<VALUEIN> cache = tempValuesCache();
+			if (cache != null) {
+				for (VALUEIN v : cache) {
+					emit(context, key, smsg, v, keyOut, valueOut);
+				}
+			}
+		}
 	}	
 	
 	/** implement structure message checking logic. The output key might be updated
@@ -76,9 +68,18 @@ public abstract class StructureMessageResolver<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
 	 * Apply some post-checking logics and emit them immediately if passed.
 	 * NOTE: At this point, structure message cannot be null !! */
 	public abstract void emit(Context context, KEYIN key, VALUEIN structureMsg, 
-		VALUEIN msg, KEYOUT keySingleton, VALUEOUT valueSingleton) throws IOException, InterruptedException;
+		VALUEIN msg, KEYOUT keySingleton, VALUEOUT valueSingleton) 
+		throws IOException, InterruptedException;
 	
 	/** what to do if no structure messages found ? */
-	public abstract void noHit(Context context, KEYIN key, Iterable<VALUEIN> cache,
-		KEYOUT keySingleton, VALUEOUT valueSingleton) throws IOException, InterruptedException; 
+	public abstract void flushNoHit(Context context, KEYIN key,
+		KEYOUT keySingleton, VALUEOUT valueSingleton) throws IOException, 
+		InterruptedException; 
+	
+	/** cache the content message arriving before the structure message (before the hit) */
+	public abstract void cacheMessagesBeforeHit(KEYIN key, VALUEIN value);
+	
+	/** access to the cache of messages arriving before the structure message (before
+	 *  the hit), or null if no structure message found */
+	public abstract Iterable<VALUEIN> tempValuesCache(); 
 }
