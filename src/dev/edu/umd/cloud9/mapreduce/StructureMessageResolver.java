@@ -5,8 +5,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 
 /**
- * A Hadoop reducer that accepts both content messages and structure 
- * messages, and update the title of all content messages with the 
+ * A Hadoop reducer that accepts both content messages and one structure 
+ * message, and update the title of all content messages with the 
  * info from the structure message.
  * @author tuan
  */ 
