@@ -15,8 +15,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 public abstract class StructureMessageResolver<KEYIN, VALUEIN, KEYOUT, VALUEOUT> 
 		extends Reducer<KEYIN, VALUEIN, KEYOUT, VALUEOUT> {
 	
-	private VALUEOUT valueOut = instantiateOutValueObject();
-	private KEYOUT keyOut = instantiateOutKeyObject();
+	private VALUEOUT valueOut = newOutputValue();
+	private KEYOUT keyOut = newOutputKey();
 	
 	@Override
 	protected void reduce(KEYIN key, Iterable<VALUEIN> values, 
@@ -44,17 +44,17 @@ public abstract class StructureMessageResolver<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
 				tmpItem = clone(value);
 				cache.add(tmpItem);
 			}
-			else checkAndEmit(context, key, smsg, value, keyOut, valueOut);
+			else emit(context, key, smsg, value, keyOut, valueOut);
 		}
 
 		// No structure messages found
 		if (smsg == null) {
-			noStructureMessageFound(context, key, cache, keyOut, valueOut);
+			noHit(context, key, cache, keyOut, valueOut);
 		}
 				
 		// second run: update the remaining links with actual destination
 		else for (VALUEIN v : cache) {
-			checkAndEmit(context, key, smsg, v, keyOut, valueOut);
+			emit(context, key, smsg, v, keyOut, valueOut);
 		}		
 	}	
 	
@@ -67,18 +67,18 @@ public abstract class StructureMessageResolver<KEYIN, VALUEIN, KEYOUT, VALUEOUT>
 	public abstract VALUEIN clone(VALUEIN t);
 	
 	/** instantiate one dummy VALUEOUT object to cache the emitted messages */
-	public abstract VALUEOUT instantiateOutValueObject();
+	public abstract VALUEOUT newOutputValue();
 	
 	/** instantiate one dummy KEYOUT object to cache the emitted messages */
-	public abstract KEYOUT instantiateOutKeyObject();
+	public abstract KEYOUT newOutputKey();
 	
 	/** after the structure message in known, subsequent messages are all content messages.
 	 * Apply some post-checking logics and emit them immediately if passed.
 	 * NOTE: At this point, structure message cannot be null !! */
-	public abstract void checkAndEmit(Context context, KEYIN key, VALUEIN structureMsg, 
+	public abstract void emit(Context context, KEYIN key, VALUEIN structureMsg, 
 		VALUEIN msg, KEYOUT keySingleton, VALUEOUT valueSingleton) throws IOException, InterruptedException;
 	
 	/** what to do if no structure messages found ? */
-	public abstract void noStructureMessageFound(Context context, KEYIN key, Iterable<VALUEIN> cache,
+	public abstract void noHit(Context context, KEYIN key, Iterable<VALUEIN> cache,
 		KEYOUT keySingleton, VALUEOUT valueSingleton) throws IOException, InterruptedException; 
 }

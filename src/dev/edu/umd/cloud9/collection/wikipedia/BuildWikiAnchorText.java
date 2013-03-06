@@ -115,17 +115,17 @@ public class BuildWikiAnchorText extends Configured implements Tool {
 		}
 
 		@Override
-		public PairOfStringInt instantiateOutValueObject() {
+		public PairOfStringInt newOutputValue() {
 			return new PairOfStringInt();
 		}
 
 		@Override
-		public Text instantiateOutKeyObject() {
+		public Text newOutputKey() {
 			return new Text();
 		}
 
 		@Override
-		public void checkAndEmit(Context context, Text key, PairOfStringInt structureMsg, 
+		public void emit(Context context, Text key, PairOfStringInt structureMsg, 
 				PairOfStringInt msg, Text keySingleton, PairOfStringInt valueSingleton) 
 				throws IOException, InterruptedException {
 			
@@ -138,7 +138,7 @@ public class BuildWikiAnchorText extends Configured implements Tool {
 
 		@Override
 		// The destination page is not a redirect. Emit everything to the phase 2
-		public void noStructureMessageFound(Context context, Text key, 
+		public void noHit(Context context, Text key, 
 				Iterable<PairOfStringInt> cache, Text keySingleton, 
 				PairOfStringInt valueSingleton)	throws IOException, InterruptedException {
 			for (PairOfStringInt v : cache) context.write(keySingleton, v);
@@ -166,17 +166,17 @@ public class BuildWikiAnchorText extends Configured implements Tool {
 		}
 
 		@Override
-		public Text instantiateOutValueObject() {			
+		public Text newOutputValue() {			
 			return new Text();
 		}
 
 		@Override
-		public Text instantiateOutKeyObject() {
+		public Text newOutputKey() {
 			return new Text();
 		}
 
 		@Override
-		public void checkAndEmit(Context context, Text key, PairOfStringInt structureMsg,
+		public void emit(Context context, Text key, PairOfStringInt structureMsg,
 				PairOfStringInt msg, Text keySingleton, Text valueSingleton) 
 				throws IOException, InterruptedException {
 			valueSingleton.set(msg.getKey() + "\t" + msg.getValue());
@@ -185,7 +185,7 @@ public class BuildWikiAnchorText extends Configured implements Tool {
 
 		@Override
 		// We lost the structure message of this page. Report it !
-		public void noStructureMessageFound(Context context, Text key,
+		public void noHit(Context context, Text key,
 				Iterable<PairOfStringInt> cache, Text keySingleton,	Text valueSingleton)
 				throws IOException, InterruptedException {
 			log.info("No structure message found for : " + key.toString());
