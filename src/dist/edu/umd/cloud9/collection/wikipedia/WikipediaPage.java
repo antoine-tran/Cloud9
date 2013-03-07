@@ -390,7 +390,7 @@ public abstract class WikipediaPage extends Indexable {
 	        break;
 
 	      String text = page.substring(start + 2, end);
-	      String anchor = null;
+	      String anchor = null, title = text;
 
 	      // skip empty links
 	      if (text.length() == 0) {
@@ -407,22 +407,22 @@ public abstract class WikipediaPage extends Indexable {
 	      // get anchor text
 	      int a;
 	      if ((a = text.indexOf("|")) != -1) {
-	        text = text.substring(0, a);
+	        title = text.substring(0, a);
 	        anchor = text.substring(a + 1);
 	      }
 
-	      if ((a = text.indexOf("#")) != -1) {
-	        text = text.substring(0, a);	        
+	      if ((a = title.indexOf("#")) != -1) {
+	    	  title = title.substring(0, a);	        
 	      }
 
 	      // ignore article-internal links, e.g., [[#section|here]]
-	      if (text.length() == 0 ) {
+	      if (title.length() == 0 ) {
 	        start = end + 1;
 	        continue;
 	      }
-	      text = text.trim();	      
-		  if (anchor == null) anchor = text;
-		  links.add(Pair.of(text, anchor));
+	      title = title.trim();	      
+		  if (anchor == null) anchor = title;
+		  links.add(Pair.of(title, anchor));
 
 	      start = end + 1;
 	    }

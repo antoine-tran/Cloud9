@@ -39,10 +39,10 @@ public class JobConfig extends Configured {
 		job.setJarByClass(jobClass);
 		
 		job.getConfiguration().setBoolean(
-				"mapred.map.tasks.speculative.execution", false);
+				"mapreduce.map.tasks.speculative.execution", false);
 		job.getConfiguration().setBoolean(
-				"mapred.reduce.tasks.speculative.execution", false);
-		job.getConfiguration().set("mapred.child.java.opts", "-Xmx2048m");
+				"mapreduce.reduce.tasks.speculative.execution", false);
+		job.getConfiguration().set("mapreduce.child.java.opts", "-Xmx2048m");
 
 		job.setNumReduceTasks(reduceNo);
 

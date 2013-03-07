@@ -26,6 +26,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import edu.umd.cloud9.io.pair.PairOfStringInt;
@@ -40,16 +41,20 @@ import edu.umd.cloud9.mapreduce.StructureMessageResolver;
 public class BuildWikiAnchorText extends JobConfig implements Tool {
 
 	private static final Logger log = Logger.getLogger(BuildWikiAnchorText.class);
+	static {
+		log.setLevel(Level.DEBUG);
+	}
 
 	private static final String LANG_OPTION = "lang";
 	private static final String INPUT_OPTION = "input";
+	private static final String OUTPUT_OPTION = "output";
 	private static final String REDUCE_NO = "reduce";
 	private static final String PHASE = "phase";
 
 	/** Map phase 1: Parse one single Wikipedia page and emits, for each outgoing 
 	 * links in the text, a (destinationLink, anchor) pair */
 	private static final class EmitAnchorMapper extends
-	Mapper<LongWritable, WikipediaPage, Text, PairOfStringInt> {
+			Mapper<LongWritable, WikipediaPage, Text, PairOfStringInt> {
 
 		private Text outKey = new Text();
 		private PairOfStringInt outVal = new PairOfStringInt();
@@ -58,6 +63,8 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 		@Override
 		protected void map(LongWritable key, WikipediaPage p,
 				Context context) throws IOException, InterruptedException {
+			
+			log.debug("Processing page: " + p.getDocid());
 			
 			// only articles are emitted
 			boolean redirected = false;
@@ -268,10 +275,8 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 		return output;
 	}
 
-	private String phase2(String inputPath, int reduceNo) throws 
+	private String phase2(String inputPath, String output, int reduceNo) throws 
 	IOException, InterruptedException, ClassNotFoundException {
-
-		String output = "tmp/wiki-anchor/phase2";
 
 		Job job = setup("Build Wikipedia Anchor text graph. Phase 1", 
 				BuildWikiAnchorText.class, inputPath, output, 
@@ -294,6 +299,10 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 		Option inputOpt = OptionBuilder.withArgName("input-path")
 				.hasArg().withDescription("XML dump file path")
 				.create(INPUT_OPTION);
+		
+		Option outputOpt = OptionBuilder.withArgName("output-path")
+				.hasArg().withDescription("XML dump file path")
+				.create(OUTPUT_OPTION);
 
 		Option reduceOpt = OptionBuilder.withArgName("reduce-no")
 				.hasArg().withDescription("numer of reducer nodes")
@@ -307,6 +316,7 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 		opts.addOption(inputOpt);
 		opts.addOption(reduceOpt);
 		opts.addOption(phaseOpt);
+		opts.addOption(outputOpt);
 
 		CommandLine cl;
 		CommandLineParser parser = new GnuParser();
@@ -318,6 +328,12 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 			return -1;
 		}		
 		if (!cl.hasOption(INPUT_OPTION)) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp(getClass().getName(), opts);
+			ToolRunner.printGenericCommandUsage(System.out);
+			return -1;
+		}
+		if (!cl.hasOption(OUTPUT_OPTION)) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp(getClass().getName(), opts);
 			ToolRunner.printGenericCommandUsage(System.out);
@@ -347,11 +363,12 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 		}
 		
 		String input = cl.getOptionValue(INPUT_OPTION);
+		String output = cl.getOptionValue(OUTPUT_OPTION);
 		if (phase == 1) {
 			phase1(input, reduceNo, lang);
 		} else if (phase == 2) {
-			String output = phase1(input, reduceNo, lang);
-			phase2(output, reduceNo);
+			String out = phase1(input, reduceNo, lang);
+			phase2(out, output, reduceNo);
 		} 
 		return 0;
 	}
