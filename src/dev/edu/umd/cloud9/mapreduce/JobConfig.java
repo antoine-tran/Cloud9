@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -11,6 +12,8 @@ import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+import edu.umd.cloud9.collection.wikipedia.BuildWikipediaDocnoMapping;
 
 /**
  * A typical setting of one Hadoop job
@@ -34,8 +37,15 @@ public class JobConfig extends Configured {
 				Class<MAPPER> mapClass,
 				Class<REDUCER> reduceClass,
 				int reduceNo) throws IOException {
-		Job job = Job.getInstance(getConf());
-		job.setJobName(jobName);
+		
+		// Hadoop 2.0
+		// Job job = Job.getInstance(getConf());
+		// job.setJobName(jobName);
+
+		// Hadoop 1.x
+		Job job = new Job(getConf(), jobName);
+		
+		// Common configurations
 		job.setJarByClass(jobClass);
 		
 		job.getConfiguration().setBoolean(

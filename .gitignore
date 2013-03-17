@@ -17,3 +17,4 @@ pom.xml.asc
 .settings
 /bin/
 .fatjar
+.DS_Store

@@ -21,6 +21,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -59,6 +60,14 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 		private Text outKey = new Text();
 		private PairOfStringInt outVal = new PairOfStringInt();
 		private Object2IntOpenHashMap<PairOfStrings> map = new Object2IntOpenHashMap<PairOfStrings>();
+		
+		@Override
+		protected void setup(Context context)
+				throws IOException, InterruptedException {
+			super.setup(context);
+			map.clear();
+		}
+
 
 		@Override
 		protected void map(LongWritable key, WikipediaPage p,
@@ -116,6 +125,13 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 
 		private List<PairOfStringInt> cache = new ArrayList<PairOfStringInt>();
 		
+		@Override
+		protected void setup(Context context) throws IOException,
+				InterruptedException {
+			super.setup(context);
+			cache.clear();
+		}
+
 		@Override
 		// Update the outkey on-the-fly
 		public boolean checkStructureMessage(Text key,
@@ -179,6 +195,13 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 			extends StructureMessageResolver<Text, PairOfStringInt, Text, Text> {
 
 		private Object2IntOpenHashMap<String> cache = new Object2IntOpenHashMap<String>();
+		
+		@Override
+		protected void setup(Context context) throws IOException,
+				InterruptedException {
+			super.setup(context);
+			cache.clear();
+		}
 		
 		@Override
 		// Update the output key on-the-fly
@@ -271,6 +294,7 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 				EnglishWikipediaPageInputFormat.class, SequenceFileOutputFormat.class,
 				Text.class, PairOfStringInt.class, Text.class, PairOfStringInt.class,
 				EmitAnchorMapper.class, RedirectResolveReducer.class, reduceNo);
+		job.getConfiguration().set("mapred.map.child.java.opts", "-Xmx4096M");
 		job.waitForCompletion(true);
 		return output;
 	}
@@ -283,6 +307,7 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 				SequenceFileInputFormat.class, TextOutputFormat.class,
 				Text.class, PairOfStringInt.class, Text.class, Text.class,
 				Mapper.class, PageIdResolveReducer.class, reduceNo);
+		job.getConfiguration().set("mapred.map.child.java.opts", "-Xmx4096M");
 		job.waitForCompletion(true);
 		return output;
 	}

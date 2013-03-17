@@ -53,7 +53,7 @@
     <condition property="platform" value="unix">
       <os family="unix" />
     </condition>
-    <condition property="platform" value="unix">
+    <condition property="platform" value="mac">
       <os family="mac" />
     </condition>
     <condition property="platform" value="windows">
@@ -101,8 +101,12 @@
     <taskdef uri="antlib:org.apache.maven.artifact.ant" classpathref="maven.lib.path"/>
   </target>
 
-  <target name="resolve" depends="install-ivy" description="--> retreive dependencies with ivy" unless="skip.resolve">
-    <ivy:retrieve/>
+  <target name="resolve" depends="install-ivy" description="--> retreive dependenciesfor Hadoop 1.x with ivy" unless="skip.resolve">
+    <ivy:retrieve conf="hadoop1"/>
+  </target>
+	
+  <target name="resolve-2" depends="install-ivy" description="--> retreive dependencies for Hadoop Yarn with ivy" unless="skip.resolve">
+    <ivy:retrieve conf="hadoop2"/>
   </target>
 
   <target name="report" depends="resolve" description="--> generates a report of dependencies">
@@ -113,12 +117,28 @@
     <javac classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
+    <!-- <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
     <javac classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
+    </javac>  -->
+    <copy todir="${build.dir}">
+      <!-- <fileset dir="${src.dir}/test" excludes="**/*.java" /> -->
+      <fileset dir="${src.dir}/dist" excludes="**/*.java" />
+    </copy>
+  </target>
+
+  <target name="compile-2" depends="init,resolve-2" description="compile the source ">
+	<javac classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
+	  <compilerarg value="-Xlint:unchecked" />
     </javac>
+    <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
+      <compilerarg value="-Xlint:unchecked" />
+    </javac>
+    <javac classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on">
+  	  <compilerarg value="-Xlint:unchecked" />
+   	</javac>
     <copy todir="${build.dir}">
       <fileset dir="${src.dir}/test" excludes="**/*.java" />
       <fileset dir="${src.dir}/dist" excludes="**/*.java" />
@@ -126,6 +146,10 @@
   </target>
 
   <target name="jar" depends="compile" description="generate the distribution">
+    <jar jarfile="${dist.dir}/cloud9-${version}.jar" basedir="${build.dir}" />
+  </target>
+	
+  <target name="jar-2" depends="compile-2" description="generate the distribution">
     <jar jarfile="${dist.dir}/cloud9-${version}.jar" basedir="${build.dir}" />
   </target>
 
@@ -214,7 +238,7 @@
     </copy>
   </target>
 
-  <target name="scripts" depends="jar">
+  <target name="scripts" depends="jar-2">
     <pathconvert property="run.path.id" refid="run.path.id" targetos="${platform}" />
     <pathconvert property="lib.path.id" refid="lib.path.id" targetos="${platform}" />
     <pathconvert property="libjars.path.id" refid="libjars.path.id" targetos="${platform}" pathsep="," />

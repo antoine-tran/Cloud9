@@ -1,20 +1,32 @@
 <ivy-module version="2.0">
   <info organisation="edu.umd" module="cloud9" revision="${version}"/>
+
+  <configurations>
+    <conf name="default"/>
+    <conf name="hadoop1" visibility="public" description="configuration for running on Hadoop 1.x" extends="default"/>
+    <conf name="hadoop2" visibility="public" description="configuration for running on Hadoop 2.x" extends="default"/>
+  </configurations>
+  
   <publications>
     <artifact type="pom" ext="pom" conf="default"/>
     <artifact type="jar" ext="jar" conf="default"/>
   </publications>
 
   <dependencies>
-    <dependency org="org.apache.hadoop" name="hadoop-common" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-api" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-common" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-common" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-nodemanager" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-resourcemanager" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-core" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="0.23.5" conf="*->*,!sources,!javadoc"/>
+    <!-- Hadoop Yarn configuration -->
+    <dependency org="org.apache.hadoop" name="hadoop-common" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-api" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-common" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-common" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-nodemanager" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-yarn-server-resourcemanager" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-hdfs" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-mapreduce-client-core" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
+    
+    <!-- Hadoop non-Yarn configuration -->
+    <dependency org="org.apache.hadoop" name="hadoop-core" rev="1.0.4" conf="hadoop1->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="1.0.4" conf="hadoop1->*,!sources,!javadoc"/>
 
     <dependency org="org.apache.pig" name="pig" rev="0.10.0" conf="*->*,!sources,!javadoc"/>
     <dependency org="org.apache.mrunit" name="mrunit" rev="0.8.0-incubating" conf="*->*,!sources,!javadoc"/>
