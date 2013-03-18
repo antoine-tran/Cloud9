@@ -114,7 +114,13 @@
   </target>
 
   <target name="compile" depends="init,resolve" description="compile the source ">
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
+    <javac classpathref="lib.path.id" srcdir="${src.dir}/dev" destdir="${build.dir}" optimize="on" debug="on">
+      <compilerarg value="-Xlint:unchecked" />
+    </javac>
+    <javac classpathref="lib.path.id" srcdir="${src.dir}/legacy" destdir="${build.dir}" optimize="on" debug="on">
+      <compilerarg value="-Xlint:unchecked" />
+    </javac>
+    <javac classpathref="lib.path.id" srcdir="${src.dir}/attic" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
     <!-- <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
@@ -125,7 +131,15 @@
     </javac>  -->
     <copy todir="${build.dir}">
       <!-- <fileset dir="${src.dir}/test" excludes="**/*.java" /> -->
-      <fileset dir="${src.dir}/dist" excludes="**/*.java" />
+      <fileset dir="${src.dir}/legacy" excludes="**/*.java" />
+    </copy>
+    <copy todir="${build.dir}">
+      <!-- <fileset dir="${src.dir}/test" excludes="**/*.java" /> -->
+      <fileset dir="${src.dir}/dev" excludes="**/*.java" />
+    </copy>
+    <copy todir="${build.dir}">
+      <!-- <fileset dir="${src.dir}/test" excludes="**/*.java" /> -->
+      <fileset dir="${src.dir}/attic" excludes="**/*.java" />
     </copy>
   </target>
 

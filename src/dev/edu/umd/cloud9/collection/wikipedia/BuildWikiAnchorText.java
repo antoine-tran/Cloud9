@@ -278,7 +278,7 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 				}
 			};
 		}
-	}
+	} 
 	
 	private String phase1(String inputPath, int reduceNo, String lang) throws 
 	IOException, InterruptedException, ClassNotFoundException {
