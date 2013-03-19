@@ -74,8 +74,7 @@
 						<configuration>
 							<sources>
 								<source>src/dev</source>
-								<source>src/integration</source>
-								<source>src/dist</source>
+								<source>src/legacy</source>
 								<source>src/attic</source>
 							</sources>
 						</configuration>

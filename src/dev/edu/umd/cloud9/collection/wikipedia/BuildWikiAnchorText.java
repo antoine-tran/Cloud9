@@ -21,6 +21,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
@@ -118,7 +119,7 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 			}	
 		}		
 	}
-	
+		
 	/** Reduce phase 1: Resolve the redirect links */
 	private static final class RedirectResolveReducer extends 
 			StructureMessageResolver<Text, PairOfStringInt, Text, PairOfStringInt> {
@@ -294,7 +295,8 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 				EnglishWikipediaPageInputFormat.class, SequenceFileOutputFormat.class,
 				Text.class, PairOfStringInt.class, Text.class, PairOfStringInt.class,
 				EmitAnchorMapper.class, RedirectResolveReducer.class, reduceNo);
-		job.getConfiguration().set("mapred.map.child.java.opts", "-Xmx4096M");
+		job.getConfiguration().set("mapred.map.child.java.opts", "-Xmx9192M");
+		job.setCombinerClass(Reducer.class);
 		job.waitForCompletion(true);
 		return output;
 	}
@@ -307,7 +309,8 @@ public class BuildWikiAnchorText extends JobConfig implements Tool {
 				SequenceFileInputFormat.class, TextOutputFormat.class,
 				Text.class, PairOfStringInt.class, Text.class, Text.class,
 				Mapper.class, PageIdResolveReducer.class, reduceNo);
-		job.getConfiguration().set("mapred.map.child.java.opts", "-Xmx4096M");
+		job.getConfiguration().set("mapred.map.child.java.opts", "-Xmx9192M");
+		job.setCombinerClass(Reducer.class);
 		job.waitForCompletion(true);
 		return output;
 	}
