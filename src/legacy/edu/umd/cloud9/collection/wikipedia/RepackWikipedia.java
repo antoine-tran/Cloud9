@@ -17,7 +17,6 @@
 package edu.umd.cloud9.collection.wikipedia;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -26,20 +25,17 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
-import org.apache.hadoop.mapred.SequenceFileInputFormat;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
@@ -48,7 +44,9 @@ import edu.umd.cloud9.collection.wikipedia.language.WikipediaPageFactory;
 
 /**
  * Tool for repacking Wikipedia XML dumps into <code>SequenceFiles</code>.
+ * This code has been re-factored to work with new Hadoop MR API
  *
+ * @author Tuan Tran
  * @author Jimmy Lin
  * @author Peter Exner
  */
@@ -57,18 +55,20 @@ public class RepackWikipedia extends Configured implements Tool {
 
   private static enum Records { TOTAL };
 
-  private static class MyMapper extends MapReduceBase implements
-  Mapper<LongWritable, WikipediaPage, IntWritable, WikipediaPage> {
+  private static class MyMapper extends Mapper<LongWritable, WikipediaPage, IntWritable, WikipediaPage> {
 
     private static final IntWritable docno = new IntWritable();
     private static final WikipediaDocnoMapping docnoMapping = new WikipediaDocnoMapping();
     
-    public void configure(JobConf job) {
+    @Override
+	protected void setup(Context context) throws IOException,
+			InterruptedException {
       try {
-        Path p = new Path(job.get(DOCNO_MAPPING_FIELD));
+    	Configuration conf = context.getConfiguration();
+        Path p = new Path(conf.get(DOCNO_MAPPING_FIELD));
         LOG.info("Loading docno mapping: " + p);
 
-        FileSystem fs = FileSystem.get(job);
+        FileSystem fs = FileSystem.get(conf);
         if (!fs.exists(p)) {
           throw new RuntimeException(p + " does not exist!");
         }
@@ -79,17 +79,17 @@ public class RepackWikipedia extends Configured implements Tool {
       }
     }
 
-    public void map(LongWritable key, WikipediaPage doc,
-        OutputCollector<IntWritable, WikipediaPage> output, Reporter reporter) throws IOException {
-      reporter.incrCounter(Records.TOTAL, 1);
+    @Override
+    protected void map(LongWritable key, WikipediaPage doc, Context context) 
+    		throws IOException, InterruptedException {      
+      context.getCounter(Records.TOTAL).increment(1);
       String id = doc.getDocid();
       if (id != null) {
         // We're going to discard pages that aren't in the docno mapping.
         int n = docnoMapping.getDocno(id);
         if (n >= 0) {
-          docno.set(n);
-          
-          output.collect(docno, doc);
+          docno.set(n);          
+          context.write(docno, doc);
         }
       }
     }
@@ -156,11 +156,12 @@ public class RepackWikipedia extends Configured implements Tool {
     // this is the default block size
     int blocksize = 1000000;
 
-    JobConf conf = new JobConf(getConf(), RepackWikipedia.class);
-    conf.setJobName(String.format("RepackWikipedia[%s: %s, %s: %s, %s: %s, %s: %s]",
-        INPUT_OPTION, inputPath, OUTPUT_OPTION, outputPath, COMPRESSION_TYPE_OPTION, compressionType, LANGUAGE_OPTION, language));
+    Job job = new Job(getConf(), String.format("RepackWikipedia[%s: %s, %s: %s, %s: %s, %s: %s]",
+        INPUT_OPTION, inputPath, OUTPUT_OPTION, outputPath, COMPRESSION_TYPE_OPTION, compressionType, 
+        LANGUAGE_OPTION, language));
 
-    conf.set(DOCNO_MAPPING_FIELD, mappingFile);
+    job.setJarByClass(RepackWikipedia.class);
+    job.getConfiguration().set(DOCNO_MAPPING_FIELD, mappingFile);
 
     LOG.info("Tool name: " + this.getClass().getName());
     LOG.info(" - XML dump file: " + inputPath);
@@ -173,42 +174,43 @@ public class RepackWikipedia extends Configured implements Tool {
       LOG.info(" - block size: " + blocksize);
     }
 
-    int mapTasks = 10;
+    /** This is obsolete */
+    // int mapTasks = 10;
+    // job.setNumMapTasks(mapTasks);
+    
+    job.setNumReduceTasks(0);
 
-    conf.setNumMapTasks(mapTasks);
-    conf.setNumReduceTasks(0);
-
-    SequenceFileInputFormat.addInputPath(conf, new Path(inputPath));
-    SequenceFileOutputFormat.setOutputPath(conf, new Path(outputPath));
+    SequenceFileInputFormat.addInputPath(job, new Path(inputPath));
+    SequenceFileOutputFormat.setOutputPath(job, new Path(outputPath));
 
     if ("none".equals(compressionType)) {
-      SequenceFileOutputFormat.setCompressOutput(conf, false);
+      SequenceFileOutputFormat.setCompressOutput(job, false);
     } else {
-      SequenceFileOutputFormat.setCompressOutput(conf, true);
+      SequenceFileOutputFormat.setCompressOutput(job, true);
 
       if ("record".equals(compressionType)) {
-        SequenceFileOutputFormat.setOutputCompressionType(conf, SequenceFile.CompressionType.RECORD);
+        SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.RECORD);
       } else {
-        SequenceFileOutputFormat.setOutputCompressionType(conf, SequenceFile.CompressionType.BLOCK);
-        conf.setInt("io.seqfile.compress.blocksize", blocksize);
+        SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.BLOCK);
+        job.getConfiguration().setInt("io.seqfile.compress.blocksize", blocksize);
       }
     }
 
     if(language != null){
-      conf.set("wiki.language", language);
+    	job.getConfiguration().set("wiki.language", language);
     }
 
-    conf.setInputFormat(WikipediaPageInputFormat.class);
-    conf.setOutputFormat(SequenceFileOutputFormat.class);
-    conf.setOutputKeyClass(IntWritable.class);
-    conf.setOutputValueClass(WikipediaPageFactory.getWikipediaPageClass(language));
+    job.setInputFormatClass(EnglishWikipediaPageInputFormat.class);
+    job.setOutputFormatClass(SequenceFileOutputFormat.class);
+    job.setOutputKeyClass(IntWritable.class);
+    job.setOutputValueClass(WikipediaPageFactory.getWikipediaPageClass(language));
 
-    conf.setMapperClass(MyMapper.class);
+    job.setMapperClass(MyMapper.class);
 
     // Delete the output directory if it exists already.
-    FileSystem.get(conf).delete(new Path(outputPath), true);
+    FileSystem.get(job.getConfiguration()).delete(new Path(outputPath), true);
 
-    JobClient.runJob(conf);
+    job.waitForCompletion(true);
 
     return 0;
   }

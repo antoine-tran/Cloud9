@@ -93,56 +93,14 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-common</artifactId>
-			<version>0.23.5</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-yarn-api</artifactId>
-			<version>0.23.5</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-yarn-common</artifactId>
-			<version>0.23.5</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-yarn-server-common</artifactId>
-			<version>0.23.5</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-yarn-server-nodemanager</artifactId>
-			<version>0.23.5</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-yarn-server-resourcemanager</artifactId>
-			<version>0.23.5</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-hdfs</artifactId>
-			<version>0.23.5</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-mapreduce-client-core</artifactId>
-			<version>0.23.5</version>
+			<artifactId>hadoop-core</artifactId>
+			<version>1.1.1</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-streaming</artifactId>
-			<version>0.23.5</version>
+			<version>1.1.1</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -259,6 +217,18 @@
 			<version>1.6</version>
 			<optional>true</optional>
 		</dependency>
+	    <dependency>
+			<groupId>tuan4j</groupId>
+			<artifactId>tuan4j-core</artifactId>
+			<version>0.2-beta1</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>tuan4j</groupId>
+			<artifactId>tuan4j-distributed</artifactId>
+			<version>0.1-beta1</version>
+			<optional>true</optional>
+		</dependency>
 		<dependency>
 			<groupId>pcj</groupId>
 			<artifactId>pcj</artifactId>
@@ -301,6 +271,11 @@
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
+        </repository>
+        <repository>
+          <id>antoine-tran-github-releases</id>
+          <name>Tuan Tran's Personal Repository for Maven</name>
+          <url>https://raw.github.com/antoine-tran/maven-repo/master/releases</url>
         </repository>
 	</repositories>
 </project>

@@ -469,7 +469,7 @@ public abstract class WikipediaPage extends Indexable {
 	
 	/** Extract the first sentence from Wikipedia page */
 	public static String firstSentence(String content) {
-		String[] sens = StringUtils.extractSentencesFromText(content);
+		String[] sens = StringUtils.extractSentencesFromText(content); 
 		return (sens != null && sens.length > 0) ? sens[0] : null;
 	}
 

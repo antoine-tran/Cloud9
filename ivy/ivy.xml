@@ -25,8 +25,12 @@
     <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="0.23.5" conf="hadoop2->*,!sources,!javadoc"/>
     
     <!-- Hadoop non-Yarn configuration -->
-    <dependency org="org.apache.hadoop" name="hadoop-core" rev="1.0.4" conf="hadoop1->*,!sources,!javadoc"/>
-    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="1.0.4" conf="hadoop1->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-core" rev="1.1.1" conf="hadoop1->*,!sources,!javadoc"/>
+    <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="1.1.1" conf="hadoop1->*,!sources,!javadoc"/>
+    
+    <!-- Tuan4j dependency -->
+    <dependency org="tuan4j" name="tuan4j-core" rev="0.2-beta1" conf="*->*,!sources,!javadoc"/>
+    <dependency org="tuan4j" name="tuan4j-distributed" rev="0.1-beta1" conf="*->*,!sources,!javadoc"/>
 
     <dependency org="org.apache.pig" name="pig" rev="0.10.0" conf="*->*,!sources,!javadoc"/>
     <dependency org="org.apache.mrunit" name="mrunit" rev="0.8.0-incubating" conf="*->*,!sources,!javadoc"/>

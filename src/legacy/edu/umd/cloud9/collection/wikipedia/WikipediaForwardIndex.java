@@ -18,8 +18,10 @@ import edu.umd.cloud9.collection.DocumentForwardIndex;
 import edu.umd.cloud9.collection.wikipedia.language.WikipediaPageFactory;
 
 /**
- * Forward index for Wikipedia collections.
+ * Forward index for Wikipedia collections. This code has been adapted to newer
+ * version of Hadoop
  *
+ * @author Tuan Tran
  * @author Jimmy Lin
  * @author Peter Exner
  */
@@ -29,7 +31,7 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
   private Configuration conf;
 
   private int[] docnos;
-  private int[] offsets;
+  private long[] offsets;
   private short[] fileno;
   private String collectionPath;
   private int lastDocno = -1;
@@ -59,12 +61,12 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
 
     LOG.info(blocks + " blocks expected");
     docnos = new int[blocks];
-    offsets = new int[blocks];
+    offsets = new long[blocks];
     fileno = new short[blocks];
 
     for (int i = 0; i < blocks; i++) {
       docnos[i] = in.readInt();
-      offsets[i] = in.readInt();
+      offsets[i] = in.readLong();
       fileno[i] = in.readShort();
 
       if (i > 0 && i % 100000 == 0)
@@ -155,12 +157,14 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
 
     DecimalFormat df = new DecimalFormat("00000");
     String file = collectionPath + "/part-" + df.format(fileno[idx]);
-
-
+    LOG.info(file);
     try {
-    	FileSystem fs = FileSystem.get(conf);
-      SequenceFile.Reader reader = 
-    		  new SequenceFile.Reader(fs, new Path(file), conf);
+      FileSystem fs = FileSystem.get(conf);
+      LOG.info("Filesystem: " + fs);
+      Path path = new Path(file);
+      LOG.info("Path: " + path);
+      SequenceFile.Reader reader = new SequenceFile.Reader(fs, path, conf); 
+          		  
       IntWritable key = new IntWritable();
 
       reader.seek(offsets[idx]);
@@ -168,10 +172,10 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
       while (reader.next(key));
       lastDocno = key.get();
       reader.close();
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      LOG.error(e);
     }
-
+    LOG.info(lastDocno);
     return lastDocno;
   }
 }

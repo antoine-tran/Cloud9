@@ -95,7 +95,7 @@ public class WikipediaDocnoMapping implements DocnoMapping {
     out.writeInt(n);
     for (int i = 0; i < n; i++) {
       reader.readLine(line);
-      String[] arr = line.toString().split("\\t");
+      String[] arr = line.toString().split("\t");
       out.writeInt(Integer.parseInt(arr[0]));
       cnt++;
       if (cnt % 100000 == 0) {
