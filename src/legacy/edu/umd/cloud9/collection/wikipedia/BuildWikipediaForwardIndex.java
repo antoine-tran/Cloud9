@@ -123,7 +123,7 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 			for (FileStatus s : status) {
 				Path path = s.getPath();
 				String name = path.getName();
-				short fileNo = Short.parseShort(name.substring(name.lastIndexOf("part-r-"))+5);
+				short fileNo = Short.parseShort(name.substring(name.lastIndexOf("part-m-"))+5);
 
 				try {
 					reader = new SequenceFile.Reader(fs, path, getConf());

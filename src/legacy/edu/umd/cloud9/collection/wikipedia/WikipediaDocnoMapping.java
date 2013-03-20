@@ -16,6 +16,7 @@
 
 package edu.umd.cloud9.collection.wikipedia;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -93,10 +94,18 @@ public class WikipediaDocnoMapping implements DocnoMapping {
 
     FSDataOutputStream out = fs.create(new Path(outputFile), true);
     out.writeInt(n);
-    for (int i = 0; i < n; i++) {
+    for (long i = 0; i < n; i++) {
       reader.readLine(line);
       String[] arr = line.toString().split("\t");
-      out.writeInt(Integer.parseInt(arr[0]));
+      try {
+    	  out.writeInt(Integer.parseInt(arr[0]));
+      } catch (NumberFormatException e) {
+    	  LOG.error("Mal-formed line: " + line.toString());
+    	  continue;
+      } catch (NullPointerException e) {
+    	  LOG.error("Mal-formed line: " + line.toString());
+    	  continue;
+      }
       cnt++;
       if (cnt % 100000 == 0) {
         LOG.info(cnt + " articles");
@@ -115,19 +124,26 @@ public class WikipediaDocnoMapping implements DocnoMapping {
    * @throws IOException
    */
   static public int[] readDocnoMappingData(Path p, FileSystem fs) throws IOException {
-    FSDataInputStream in = fs.open(p);
+    FSDataInputStream in = null;
+    int[] arr = null;
+    int sz = 0;
+    int i = 0;
+    try {
+    	in = fs.open(p);
+    	
+    	// docnos start at one, so we need an array that's one larger than number of docs.
+        sz = in.readInt() + 1;
+        arr = new int[sz];
 
-    // docnos start at one, so we need an array that's one larger than number of docs.
-    int sz = in.readInt() + 1;
-    int[] arr = new int[sz];
-
-    for (int i = 1; i < sz; i++) {
-      arr[i] = in.readInt();
+        for (i = 1; i < sz; i++) {
+          arr[i] = in.readInt();
+        }
+        arr[0] = 0;
+    } catch (EOFException e) {
+    	LOG.error("Expected " + sz + " pages. Got " + i);
+    } finally {
+        if (in != null) in.close();
     }
-    in.close();
-
-    arr[0] = 0;
-
     return arr;
   }
 

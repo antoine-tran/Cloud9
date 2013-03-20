@@ -214,7 +214,9 @@ public class BuildWikipediaDocnoMapping extends Configured implements Tool {
     long cnt = keepAll ? c.findCounter(PageTypes.TOTAL).getValue() : 
     	c.findCounter(PageTypes.ARTICLE).getValue();
 
-    WikipediaDocnoMapping.writeDocnoMappingData(fs, outputPath + "/part-r-00000", (int) cnt, outputFile);
+    LOG.info("Mapped " + cnt + " pages");
+    
+    WikipediaDocnoMapping.writeDocnoMappingData(fs, outputPath + "/part-r-00000", (int)cnt, outputFile);
 
     return 0;
   }
