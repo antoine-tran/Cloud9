@@ -72,8 +72,8 @@ public class RepackWikipedia extends Configured implements Tool {
         if (!fs.exists(p)) {
           throw new RuntimeException(p + " does not exist!");
         }
-
         docnoMapping.loadMapping(p, fs);
+        LOG.info("loaded docno mapping with " + docnoMapping.size() + " mappings");
       } catch (Exception e) {
     	e.printStackTrace();
         throw new InterruptedException("Error loading docno mapping data file!");
@@ -91,6 +91,8 @@ public class RepackWikipedia extends Configured implements Tool {
         if (n >= 0) {
           docno.set(n);          
           context.write(docno, doc);
+        } else {
+        	LOG.info("Could not find wikipedia page #" + id);
         }
       }
     }

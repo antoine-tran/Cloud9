@@ -34,6 +34,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.util.Tool;
@@ -108,7 +109,8 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 		SequenceFile.Reader reader = null;
 		try {
 			FileSystem fs = FileSystem.get(getConf());
-			FileStatus[] status = fs.listStatus(inputPath);
+			FileStatus[] status = fs.listStatus(inputPath, new PathFilter() {				
+				public boolean accept(Path p) {	return p.getName().startsWith("part-m-");}});
 
 			out = fs.create(new Path(indexFile), true);
 			out.writeUTF("edu.umd.cloud9.collection.wikipedia.WikipediaForwardIndex");
@@ -123,16 +125,18 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 			for (FileStatus s : status) {
 				Path path = s.getPath();
 				String name = path.getName();
-				short fileNo = Short.parseShort(name.substring(name.lastIndexOf("part-m-"))+5);
+				LOG.info("processing file " + name);
+				short fileNo = Short.parseShort(name.substring(name.lastIndexOf("part-m-")+7));
 
 				try {
 					reader = new SequenceFile.Reader(fs, path, getConf());
 					IntWritable key = new IntWritable();
-					WikipediaPage val = WikipediaPageFactory.createWikipediaPage(language);
 					long prevPos = reader.getPosition();
-					while (reader.next(key, val)) {
+					while (reader.next(key)) {
 						blocks++;
-						docNos.add(key.get());
+						int id = key.get();
+						LOG.info(" docNo: " + key.get());
+						docNos.add(id);
 						offsets.add(prevPos);
 						fileNos.add(fileNo);
 						prevPos = reader.getPosition();

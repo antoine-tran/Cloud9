@@ -92,26 +92,31 @@ public class WikipediaDocnoMapping implements DocnoMapping {
     int cnt = 0;
     Text line = new Text();
 
-    FSDataOutputStream out = fs.create(new Path(outputFile), true);
-    out.writeInt(n);
-    for (long i = 0; i < n; i++) {
-      reader.readLine(line);
-      String[] arr = line.toString().split("\t");
-      try {
-    	  out.writeInt(Integer.parseInt(arr[0]));
-      } catch (NumberFormatException e) {
-    	  LOG.error("Mal-formed line: " + line.toString());
-    	  continue;
-      } catch (NullPointerException e) {
-    	  LOG.error("Mal-formed line: " + line.toString());
-    	  continue;
-      }
-      cnt++;
-      if (cnt % 100000 == 0) {
-        LOG.info(cnt + " articles");
-      }
+    FSDataOutputStream out = null;
+    
+    try {
+    	out = fs.create(new Path(outputFile), true);
+    	out.writeInt(n);
+        for (long i = 0; i < n; i++) {
+          reader.readLine(line);
+          String[] arr = line.toString().split("\t");
+          try {
+        	  out.writeInt(Integer.parseInt(arr[0]));
+          } catch (NumberFormatException e) {
+        	  LOG.error("Mal-formed line: " + line.toString());
+        	  continue;
+          } catch (NullPointerException e) {
+        	  LOG.error("Mal-formed line: " + line.toString());
+        	  continue;
+          }
+          cnt++;
+          if (cnt % 100000 == 0) {
+            LOG.info(cnt + " articles");
+          }
+        }
+    } finally {
+    	if (out != null) out.close();
     }
-    out.close();
     LOG.info("Done!");
   }
 
@@ -160,17 +165,23 @@ public class WikipediaDocnoMapping implements DocnoMapping {
    */
   public static void main(String[] args) throws IOException {
     if (args.length < 2) {
-      System.out.println("usage: (getDocno|getDocid|printAll) [mapping-file] [docid/docno]");
+      System.out.println("usage: (getDocno|getDocid|printAll|writeMapping) [mapping-file] [docid/docno/mapping-tmp-file] [size-of-mappings]");
       System.exit(-1);
     }
 
     Configuration conf = new Configuration();
     FileSystem fs = FileSystem.get(conf);
 
-    System.out.println("loading mapping file " + args[1]);
-    WikipediaDocnoMapping mapping = new WikipediaDocnoMapping();
+    if ("writeMapping".equals(args[0])) {
+    	System.out.println("Writing mapping file to " + args[1]);
+    	WikipediaDocnoMapping.writeDocnoMappingData(fs, args[2], Integer.parseInt(args[3]), args[1]);
+    	System.exit(0);
+    }
+    
+    System.out.println("loading mapping file " + args[1]);    
+    WikipediaDocnoMapping mapping = new WikipediaDocnoMapping();    
     mapping.loadMapping(new Path(args[1]), fs);
-
+    System.out.println("Size: " + mapping.size());
     if (args[0].equals("getDocno")) {
       System.out.println("looking up docno for \"" + args[2] + "\"");
       int idx = mapping.getDocno(args[2]);
@@ -194,5 +205,9 @@ public class WikipediaDocnoMapping implements DocnoMapping {
       System.out.println("Invalid command!");
       System.out.println("usage: (getDocno|getDocid) [mapping-file] [docid/docno]");
     }
+  }
+  
+  public int size() {
+	  return (docids != null && docids.length > 0) ? docids.length : -1;
   }
 }

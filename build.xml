@@ -1,7 +1,7 @@
 <project name="Cloud9" default="scripts"
          xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:artifact="antlib:org.apache.maven.artifact.ant" basedir=".">
   <description>Cloud9, University of Maryland's Hadoop Library</description>
-
+	
   <property name="lib.dir" value="lib" />
   <property name="build.dir" value="build"/>
   <property name="src.dir" value="src"/>
@@ -10,7 +10,6 @@
   <property name="javadoc.dir" location="docs/api/" />
   <property name="test.junit.dir" location="${test.dir}/junit" />
   <property name="integration.dir" location="${test.dir}/integration" />
-
   <property name="version" value="1.4.9"/>
 
   <!-- paths used for compilation and run  -->
@@ -160,9 +159,15 @@
   </target>
 
   <target name="jar" depends="compile" description="generate the distribution">
-    <jar jarfile="${dist.dir}/cloud9-${version}.jar" basedir="${build.dir}" />
+    <jar jarfile="${dist.dir}/cloud9-${version}.jar" basedir="${build.dir}"/>
   </target>
 	
+  <target name="fatjar" depends="compile" description="generate the single jar">
+	<jar jarfile="${dist.dir}/cloud9-${version}-fat.jar" basedir="${build.dir}">
+	  <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>	  
+	</jar>
+  </target>
+  	
   <target name="jar-2" depends="compile-2" description="generate the distribution">
     <jar jarfile="${dist.dir}/cloud9-${version}.jar" basedir="${build.dir}" />
   </target>
