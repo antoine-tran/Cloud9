@@ -68,9 +68,6 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
       docnos[i] = in.readInt();
       offsets[i] = in.readLong();
       fileno[i] = in.readShort();
-
-      if (i > 0 && i % 100000 == 0)
-        LOG.info(i + " blocks read");
     }
 
     in.close();

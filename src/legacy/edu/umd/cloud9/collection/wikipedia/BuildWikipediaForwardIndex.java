@@ -41,7 +41,6 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
-import edu.umd.cloud9.collection.wikipedia.language.WikipediaPageFactory;
 
 /**
  * Tool for building a document forward index for Wikipedia.
@@ -106,7 +105,6 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 		LOG.info(" - language: " + language);
 
 		FSDataOutputStream out = null;
-		SequenceFile.Reader reader = null;
 		try {
 			FileSystem fs = FileSystem.get(getConf());
 			FileStatus[] status = fs.listStatus(inputPath, new PathFilter() {				
@@ -127,7 +125,7 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 				String name = path.getName();
 				LOG.info("processing file " + name);
 				short fileNo = Short.parseShort(name.substring(name.lastIndexOf("part-m-")+7));
-
+				SequenceFile.Reader reader = null;
 				try {
 					reader = new SequenceFile.Reader(fs, path, getConf());
 					IntWritable key = new IntWritable();
@@ -149,6 +147,14 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 						pos = reader.getPosition();
 						prevDocno = key.get();
 					}	
+					
+					// flush the last one
+					/*if (prevPos != -1) {
+						docNos.add(prevDocno);
+						offsets.add(prevPos);
+						fileNos.add(fileNo);
+						blocks++;
+					}*/
 				} finally {
 					if (reader != null) reader.close();
 				}	
