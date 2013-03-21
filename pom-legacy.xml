@@ -54,7 +54,7 @@
 					<downloadJavadocs>true</downloadJavadocs>
 					<includes>
 					  <include>src/legacy/**/*.java</include>
-					  <include>src/dev/**/*.java</include>
+					  <include>src/contrib/**/*.java</include>
 					  <include>src/attic/**/*.java</include>
 					</includes>
 				</configuration>
@@ -78,7 +78,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>src/dev</source>
+								<source>src/contrib</source>
 								<source>src/legacy</source>
 								<source>src/attic</source>
 							</sources>

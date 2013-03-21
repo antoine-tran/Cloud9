@@ -3,6 +3,7 @@
   <description>Cloud9, University of Maryland's Hadoop Library</description>
 	
   <property name="lib.dir" value="lib" />
+  <property name="project.encoding" value="UTF-8"/>
   <property name="build.dir" value="build"/>
   <property name="src.dir" value="src"/>
   <property name="dist.dir" value="dist"/>
@@ -113,13 +114,13 @@
   </target>
 
   <target name="compile" depends="init,resolve" description="compile the source ">
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/legacy" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/legacy" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/attic" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/attic" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/dev" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/contrib" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
     <!-- <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
@@ -134,7 +135,7 @@
     </copy>
     <copy todir="${build.dir}">
       <!-- <fileset dir="${src.dir}/test" excludes="**/*.java" /> -->
-      <fileset dir="${src.dir}/dev" excludes="**/*.java" />
+      <fileset dir="${src.dir}/contrib" excludes="**/*.java" />
     </copy>
     <copy todir="${build.dir}">
       <!-- <fileset dir="${src.dir}/test" excludes="**/*.java" /> -->
@@ -143,13 +144,13 @@
   </target>
 
   <target name="compile-2" depends="init,resolve-2" description="compile the source ">
-	<javac classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
+	<javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
 	  <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on">
   	  <compilerarg value="-Xlint:unchecked" />
    	</javac>
     <copy todir="${build.dir}">
