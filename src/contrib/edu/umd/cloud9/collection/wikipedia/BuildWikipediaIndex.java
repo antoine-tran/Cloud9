@@ -38,13 +38,12 @@ public class BuildWikipediaIndex extends Configured implements Tool {
 				ToolRunner.printGenericCommandUsage(System.out);
 				return -1;
 			}
-			System.out.println(args[0]);
 			Configuration conf = getConf();
 			WikipediaForwardIndex f = new WikipediaForwardIndex(conf);
-			f.loadIndex(new Path(args[1]), new Path(args[2]), FileSystem.get(conf));
+			f.loadIndex(new Path(args[0]), new Path(args[1]), FileSystem.get(conf));
 			
 			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-			lucene = LuceneIndex.createIndexWriter(analyzer, args[3], OpenMode.CREATE);
+			lucene = LuceneIndex.createIndexWriter(analyzer, args[2], OpenMode.CREATE);
 			
 			int beginId = f.getFirstDocno();
 			LOG.info("Tuan: begin ID " + beginId);			
