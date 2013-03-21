@@ -215,6 +215,8 @@ public class RepackWikipedia extends Configured implements Tool {
 
     job.waitForCompletion(true);
 
+    LOG.info("Total size: " + job.getCounters().findCounter(Records.TOTAL).getValue());
+    
     return 0;
   }
 
