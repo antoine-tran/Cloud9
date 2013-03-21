@@ -137,7 +137,6 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 
 					while (reader.next(key)) {
 						if (prevPos != -1 && prevPos != pos) {
-							//LOG.info("- beginning of block at " + prevPos + ", docno:" + prevDocno + ", file:" + fileNo);
 							docNos.add(prevDocno);
 							offsets.add(prevPos);
 							fileNos.add(fileNo);
@@ -147,14 +146,6 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 						pos = reader.getPosition();
 						prevDocno = key.get();
 					}	
-					
-					// flush the last one
-					/*if (prevPos != -1) {
-						docNos.add(prevDocno);
-						offsets.add(prevPos);
-						fileNos.add(fileNo);
-						blocks++;
-					}*/
 				} finally {
 					if (reader != null) reader.close();
 				}	

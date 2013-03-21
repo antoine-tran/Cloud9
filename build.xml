@@ -3,6 +3,7 @@
   <description>Cloud9, University of Maryland's Hadoop Library</description>
 	
   <property name="lib.dir" value="lib" />
+  <property name="local-lib.dir" value="ivy/local-repo" />
   <property name="project.encoding" value="UTF-8"/>
   <property name="build.dir" value="build"/>
   <property name="src.dir" value="src"/>
@@ -16,6 +17,7 @@
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">
     <fileset dir="${lib.dir}" />
+  	<fileset dir="${local-lib.dir}" />
   </path>
   <path id="run.path.id">
     <path refid="lib.path.id" />
