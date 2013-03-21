@@ -104,7 +104,7 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 		LOG.info(" - index file: " + indexFile);
 		LOG.info("Note: This tool only works on block-compressed SequenceFiles!");
 		LOG.info(" - language: " + language);
-		
+
 		FSDataOutputStream out = null;
 		SequenceFile.Reader reader = null;
 		try {
@@ -131,15 +131,23 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 				try {
 					reader = new SequenceFile.Reader(fs, path, getConf());
 					IntWritable key = new IntWritable();
-					long prevPos = reader.getPosition();
+					long pos = -1;
+					long prevPos = -1;
+
+					int prevDocno = 0;
+					pos = reader.getPosition();
+
 					while (reader.next(key)) {
 						blocks++;
-						int id = key.get();
-						LOG.info(" docNo: " + key.get());
-						docNos.add(id);
-						offsets.add(prevPos);
-						fileNos.add(fileNo);
-						prevPos = reader.getPosition();
+						if (prevPos != -1 && prevPos != pos) {
+							LOG.info("- beginning of block at " + prevPos + ", docno:" + prevDocno + ", file:" + fileNo);
+							docNos.add(prevDocno);
+							offsets.add(prevPos);
+							fileNos.add(fileNo);
+						}
+						prevPos = pos;
+						pos = reader.getPosition();
+						prevDocno = key.get();
 					}	
 				} finally {
 					if (reader != null) reader.close();
@@ -153,7 +161,7 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 
 			// we did not use MapReduce so we have to manually sort the arrays
 			sort(docsNo, offset, filesNo, 0, blocks);
-			
+
 			for (int i = 0; i < blocks; i++) {
 				out.writeInt(docsNo[i]);
 				out.writeLong(offset[i]);
