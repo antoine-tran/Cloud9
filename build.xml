@@ -296,14 +296,14 @@
   <target name="publish-local-mac" depends="jar" description="publish jar/source to maven repo mounted personal computer">
     <ivy:publish resolver="local-m2-publish-mac" forcedeliver="true" overwrite="true" publishivy="false">
       <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]"/>
-      <artifacts pattern="pom.xml"/>
+      <artifacts pattern="pom-legacy.xml"/>
     </ivy:publish>
   </target>
 	
   <target name="publish-local-debian" depends="jar" description="publish jar/source to maven repo mounted at office computer">
 	<ivy:publish resolver="local-m2-publish-debian" forcedeliver="true" overwrite="true" publishivy="false">
 	  <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]"/>
-	  <artifacts pattern="pom.xml"/>
+	  <artifacts pattern="pom-legacy.xml"/>
 	</ivy:publish>
   </target>
 

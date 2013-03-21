@@ -52,6 +52,11 @@
 					<encoding>UTF-8</encoding>
 					<downloadSources>true</downloadSources>
 					<downloadJavadocs>true</downloadJavadocs>
+					<includes>
+					  <include>src/legacy/**/*.java</include>
+					  <include>src/dev/**/*.java</include>
+					  <include>src/attic/**/*.java</include>
+					</includes>
 				</configuration>
 			</plugin>
 
@@ -84,7 +89,7 @@
 
 		</plugins>
 
-		<sourceDirectory>src/dist</sourceDirectory>
+		<sourceDirectory>src/legacy</sourceDirectory>
 		<testSourceDirectory>src/test</testSourceDirectory>
 		<outputDirectory>build</outputDirectory>
 		<finalName>${articfactId}-${project.version}-SNAPSHOT</finalName>

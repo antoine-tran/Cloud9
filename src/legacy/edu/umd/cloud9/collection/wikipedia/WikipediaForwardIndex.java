@@ -78,7 +78,7 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
 
   @Override
   public String getCollectionPath() {
-    return collectionPath;
+    return collectionPath; 
   }
 
   @Override
@@ -88,14 +88,14 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
     // trap invalid docnos
     if (docno < getFirstDocno() || docno > getLastDocno())
       return null;
-
+ 
     int idx = Arrays.binarySearch(docnos, docno);
 
     if (idx < 0)
       idx = -idx - 2;
 
     DecimalFormat df = new DecimalFormat("00000");
-    String file = collectionPath + "/part-" + df.format(fileno[idx]);
+    String file = collectionPath + "/part-m-" + df.format(fileno[idx]);
 
     LOG.info("fetching docno " + docno + ": seeking to " + offsets[idx] + " at " + file);
 
@@ -146,7 +146,7 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
   }
 
   @Override
-  public int getLastDocno() {
+  public int getLastDocno() { 
     if (lastDocno != -1) {
       return lastDocno;
     }
@@ -156,7 +156,7 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
     int idx = docnos.length - 1;
 
     DecimalFormat df = new DecimalFormat("00000");
-    String file = collectionPath + "/part-" + df.format(fileno[idx]);
+    String file = collectionPath + "/part-m-" + df.format(fileno[idx]);
     LOG.info(file);
     try {
       FileSystem fs = FileSystem.get(conf);
