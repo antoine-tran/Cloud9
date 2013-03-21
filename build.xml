@@ -113,13 +113,13 @@
   </target>
 
   <target name="compile" depends="init,resolve" description="compile the source ">
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/dev" destdir="${build.dir}" optimize="on" debug="on">
-      <compilerarg value="-Xlint:unchecked" />
-    </javac>
     <javac classpathref="lib.path.id" srcdir="${src.dir}/legacy" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
     <javac classpathref="lib.path.id" srcdir="${src.dir}/attic" destdir="${build.dir}" optimize="on" debug="on">
+      <compilerarg value="-Xlint:unchecked" />
+    </javac>
+    <javac classpathref="lib.path.id" srcdir="${src.dir}/dev" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
     <!-- <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
