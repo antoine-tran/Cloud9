@@ -173,7 +173,8 @@ public class WikipediaForwardIndex implements DocumentForwardIndex<WikipediaPage
       lastDocno = key.get();
       reader.close();
     } catch (Exception e) {
-      LOG.error(e);
+      e.printStackTrace();
+      //LOG.error(e);
     }
     LOG.info(lastDocno);
     return lastDocno;
