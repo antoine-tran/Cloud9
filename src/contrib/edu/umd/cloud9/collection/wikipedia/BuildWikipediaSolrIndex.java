@@ -20,19 +20,8 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.util.Version;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
-
-import tuan.lucene.LuceneIndex;
-import tuan.lucene.VectorTextField;
 
 import edu.umd.cloud9.collection.wikipedia.WikipediaPage;
 import edu.umd.cloud9.collection.wikipedia.language.WikipediaPageFactory;
@@ -47,7 +36,7 @@ public class BuildWikipediaSolrIndex extends Configured implements Tool {
 	private static final String BLOCK_COMPRESS_FILE_OPT = "input";
 	private static final String SOLR_HTTP = "index";
 	private static final String LANGUAGE_OPT = "wiki_language";
-		
+			
 	@SuppressWarnings("static-access")
 	@Override
 	public int run(String[] args) throws Exception {
