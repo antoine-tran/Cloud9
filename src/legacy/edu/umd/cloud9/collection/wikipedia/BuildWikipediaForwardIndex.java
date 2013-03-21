@@ -138,12 +138,12 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 					pos = reader.getPosition();
 
 					while (reader.next(key)) {
-						blocks++;
 						if (prevPos != -1 && prevPos != pos) {
 							LOG.info("- beginning of block at " + prevPos + ", docno:" + prevDocno + ", file:" + fileNo);
 							docNos.add(prevDocno);
 							offsets.add(prevPos);
 							fileNos.add(fileNo);
+							blocks++;
 						}
 						prevPos = pos;
 						pos = reader.getPosition();
@@ -159,7 +159,7 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 			long[] offset = offsets.toLongArray();
 			short[] filesNo = fileNos.toShortArray();
 			
-			LOG.info(docsNo.length + ", " + offset.length + ", " + filesNo.length);
+			LOG.info(docsNo.length + ", " + offset.length + ", " + filesNo.length + ", " + blocks);
 
 			// we did not use MapReduce so we have to manually sort the arrays
 			sort(docsNo, offset, filesNo, 0, blocks);
