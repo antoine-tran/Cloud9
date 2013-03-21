@@ -53,7 +53,7 @@ import edu.umd.cloud9.collection.wikipedia.language.WikipediaPageFactory;
 public class RepackWikipedia extends Configured implements Tool {
   private static final Logger LOG = Logger.getLogger(RepackWikipedia.class);
 
-  private static enum Records { TOTAL };
+  private static enum Records { TOTAL, WRITTEN };
 
   private static class MyMapper extends Mapper<LongWritable, WikipediaPage, IntWritable, WikipediaPage> {
 
@@ -91,6 +91,7 @@ public class RepackWikipedia extends Configured implements Tool {
         if (n >= 0) {
           docno.set(n);          
           context.write(docno, doc);
+          context.getCounter(Records.WRITTEN).increment(1);
         } else {
         	LOG.info("Could not find wikipedia page #" + id);
         }
@@ -214,8 +215,6 @@ public class RepackWikipedia extends Configured implements Tool {
     FileSystem.get(job.getConfiguration()).delete(new Path(outputPath), true);
 
     job.waitForCompletion(true);
-
-    LOG.info("Total size: " + job.getCounters().findCounter(Records.TOTAL).getValue());
     
     return 0;
   }
