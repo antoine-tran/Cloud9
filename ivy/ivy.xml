@@ -44,7 +44,7 @@
 
     <dependency org="" name="sux4j" rev="2.0.1" conf="*->*,!sources,!javadoc"/>
     <dependency org="" name="dsiutils" rev="1.0.12" conf="*->*,!sources,!javadoc"/>
-    <dependency org="fastutil" name="fastutil" rev="5.1.5" conf="*->*,!sources,!javadoc"/>
+    <dependency org="it.unimi.dsi" name="fastutil" rev="6.5.2" conf="*->*,!sources,!javadoc"/>
 
     <dependency org="info.bliki.wiki" name="bliki-core" rev="3.0.19" conf="*->*,!sources,!javadoc">
       <exclude org="commons-httpclient" module="commons-httpclient"/>

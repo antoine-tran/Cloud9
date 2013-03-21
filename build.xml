@@ -114,13 +114,13 @@
   </target>
 
   <target name="compile" depends="init,resolve" description="compile the source ">
-    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/legacy" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/legacy" destdir="${build.dir}" optimize="on" debug="on"  includeantruntime="true">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/attic" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/attic" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="true">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/contrib" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/contrib" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="true">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
     <!-- <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
@@ -144,13 +144,13 @@
   </target>
 
   <target name="compile-2" depends="init,resolve-2" description="compile the source ">
-	<javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
+	<javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="true">
 	  <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="true">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="${project.encoding}" classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on" includeantruntime="true">
   	  <compilerarg value="-Xlint:unchecked" />
    	</javac>
     <copy todir="${build.dir}">
