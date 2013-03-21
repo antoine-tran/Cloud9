@@ -158,6 +158,8 @@ public class BuildWikipediaForwardIndex extends Configured implements Tool {
 			int[] docsNo = docNos.toIntArray();
 			long[] offset = offsets.toLongArray();
 			short[] filesNo = fileNos.toShortArray();
+			
+			LOG.info(docsNo.length + ", " + offset.length + ", " + filesNo.length);
 
 			// we did not use MapReduce so we have to manually sort the arrays
 			sort(docsNo, offset, filesNo, 0, blocks);
