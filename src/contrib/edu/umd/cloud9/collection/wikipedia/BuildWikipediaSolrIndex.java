@@ -83,7 +83,8 @@ public class BuildWikipediaSolrIndex extends Configured implements Tool {
 		LOG.info(" - solr HTTP : " + solrUrl);
 		LOG.info("Note: This tool only works on block-compressed SequenceFiles!");
 		LOG.info(" - language: " + lang);
-
+		LOG.info("=============================================================");
+		
 		HttpSolrServer solr = null;
 		
 		FileSystem fs = FileSystem.get(getConf());
