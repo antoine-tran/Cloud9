@@ -90,7 +90,8 @@ public class BuildWikipediaSolrIndex extends Configured implements Tool {
 		FileStatus[] status = fs.listStatus(inputPath, new PathFilter() {				
 			public boolean accept(Path p) {	return p.getName().startsWith("part-m-");}
 		});
-
+		LOG.info("Files: " + status.length);
+		
 		try {						
 			solr = new HttpSolrServer(solrUrl);
 			
