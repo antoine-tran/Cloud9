@@ -167,7 +167,8 @@
 	
   <target name="fatjar" depends="compile" description="generate the single jar">
 	<jar jarfile="${dist.dir}/cloud9-${version}-fat.jar" basedir="${build.dir}">
-	  <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>	  
+	  <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>	
+	  <zipgroupfileset dir="${local-lib.dir}" includes="*.jar"/>
 	</jar>
   </target>
   	

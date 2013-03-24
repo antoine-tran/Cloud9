@@ -92,7 +92,8 @@ public class BuildWikipediaSolrIndex extends Configured implements Tool {
 		});
 
 		try {						
-			solr = new HttpSolrServer(solrUrl);			
+			solr = new HttpSolrServer(solrUrl);
+			int cnt = 0;
 			for (FileStatus s : status) {
 				Path path = s.getPath();
 				String name = path.getName();
@@ -125,6 +126,11 @@ public class BuildWikipediaSolrIndex extends Configured implements Tool {
 						docs.add(doc);
 					}
 					solr.add(docs);
+					if (++cnt % 1000 == 0) {
+						LOG.info("committed " + cnt + " pages");
+						solr.commit();
+					}
+ 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -28,9 +28,11 @@
     <dependency org="org.apache.hadoop" name="hadoop-core" rev="1.0.4" conf="hadoop1->*,!sources,!javadoc"/>
     <dependency org="org.apache.hadoop" name="hadoop-streaming" rev="1.0.4" conf="hadoop1->*,!sources,!javadoc"/>
     
-    <!-- Solr dependency 
-    <dependency org="org.apache.solr" name="solr-core" rev="4.2.0" conf="*->*,!sources,!javadoc"/>
-    <dependency org="org.apache.solr" name="solr-solrj" rev="4.2.0" conf="*->*,!sources,!javadoc"/> -->
+    <!-- Solr dependency --> 
+    <dependency org="org.apache.solr" name="solr-core" rev="4.1.0" conf="*->*,!sources,!javadoc">
+    	<exclude org="org.eclipse.jetty.orbit" module="javax.servlet"/>
+    </dependency>
+    <dependency org="org.apache.solr" name="solr-solrj" rev="4.1.0" conf="*->*,!sources,!javadoc"/>
     
     <!-- Tuan4j dependency -->
     <dependency org="tuan4j" name="tuan4j-core" rev="0.2-beta1" conf="*->*,!sources,!javadoc"/>
