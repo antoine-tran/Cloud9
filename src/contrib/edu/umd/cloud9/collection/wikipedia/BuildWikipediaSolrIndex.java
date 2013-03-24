@@ -138,6 +138,8 @@ public class BuildWikipediaSolrIndex extends Configured implements Tool {
 					if (reader != null) reader.close();
 				}
 			}
+		} catch (Exception e) {
+			
 		} finally {			
 			if (solr != null) {
 				solr.commit();
