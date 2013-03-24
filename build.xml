@@ -165,10 +165,15 @@
     <jar jarfile="${dist.dir}/cloud9-${version}.jar" basedir="${build.dir}"/>
   </target>
 	
+  <target name="copy-local-ivy-to-lib">
+  	<copy todir="${lib.dir}">
+  	    <fileset dir="${local-lib.dir}" includes="**"/>
+  	</copy> 
+  </target>
+	
   <target name="fatjar" depends="compile" description="generate the single jar">
 	<jar jarfile="${dist.dir}/cloud9-${version}-fat.jar" basedir="${build.dir}">
 	  <zipgroupfileset dir="${lib.dir}" includes="*.jar"/>	
-	  <zipgroupfileset dir="${local-lib.dir}" includes="*.jar"/>
 	</jar>
   </target>
   	
