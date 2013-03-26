@@ -30,6 +30,7 @@ import edu.umd.cloud9.collection.wikipedia.language.WikipediaPageFactory;
  * paragraph, content
  * @author Tuan Tran 
  */
+@Deprecated
 public class BuildWikipediaSolrIndex extends Configured implements Tool {
 	private static final Logger LOG = Logger.getLogger(BuildWikipediaSolrIndex.class);
 	
