@@ -25,7 +25,7 @@ import edu.umd.cloud9.integration.IntegrationUtils;
 import edu.umd.cloud9.io.array.ArrayListWritable;
 import edu.umd.cloud9.webgraph.DriverUtil;
 import edu.umd.cloud9.webgraph.data.AnchorText;
-import edu.umd.cloud9.webgraph.driver.TrecDriver;
+
 
 public class VerifyGov2Webgraph {
   private static final Random rand = new Random();
@@ -68,7 +68,12 @@ public class VerifyGov2Webgraph {
     ImmutableSet.of(51706));
 
   @Test
-  public void runTrecDriver() throws Exception {
+  public void runTests() throws Exception {
+    runTrecDriver();
+    verifyAnchors();
+  }
+
+  private void runTrecDriver() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -78,7 +83,7 @@ public class VerifyGov2Webgraph {
 
     List<String> jars = Lists.newArrayList();
     jars.add(IntegrationUtils.getJar("dist", "cloud9"));
-    jars.add(IntegrationUtils.getJar("lib", "guava-13"));
+    jars.add(IntegrationUtils.getJar("lib", "guava"));
     jars.add(IntegrationUtils.getJar("lib", "dsiutils"));
     jars.add(IntegrationUtils.getJar("lib", "fastutil"));
     jars.add(IntegrationUtils.getJar("lib", "sux4j"));
@@ -101,8 +106,7 @@ public class VerifyGov2Webgraph {
     IntegrationUtils.exec(Joiner.on(" ").join(args));
   }
 
-  @Test
-  public void verifyAnchors() throws Exception {
+  private void verifyAnchors() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -110,16 +114,16 @@ public class VerifyGov2Webgraph {
     IntWritable key = new IntWritable();
     ArrayListWritable<AnchorText> value = new ArrayListWritable<AnchorText>();
 
-    reader = new SequenceFile.Reader(fs,
-        new Path(collectionOutput + "/" + DriverUtil.OUTPUT_WEGIHTED_REVERSE_WEBGRAPH + "/part-00000"), fs.getConf());
+    reader = new SequenceFile.Reader(fs.getConf(), SequenceFile.Reader.file(
+        new Path(collectionOutput + "/" + DriverUtil.OUTPUT_WEGIHTED_REVERSE_WEBGRAPH + "/part-00000")));
     reader.next(key, value);
     reader.next(key, value);
     verifyWeights(anchorList1, value);
     verifySources(anchorSources1, value);
     reader.close();
 
-    reader = new SequenceFile.Reader(fs,
-        new Path(collectionOutput + "/" + DriverUtil.OUTPUT_WEGIHTED_REVERSE_WEBGRAPH + "/part-00010"), fs.getConf());
+    reader = new SequenceFile.Reader(fs.getConf(), SequenceFile.Reader.file(
+        new Path(collectionOutput + "/" + DriverUtil.OUTPUT_WEGIHTED_REVERSE_WEBGRAPH + "/part-00010")));
     reader.next(key, value);
     reader.next(key, value);
     verifyWeights(anchorList2, value);

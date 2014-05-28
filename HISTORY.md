@@ -1,3 +1,68 @@
+Version 1.5.0
+=============
+November 24, 2013
+
++ Upgraded to JDK7
++ Upgraded to CDH 4.4.0
++ Fixed minor integration/regression issues as a result of upgrade to JDK7
+
+Version 1.4.17
+==============
+July 6, 2013
+
++ Upgraded to CDH 4.3.0
+
+Version 1.4.16
+==============
+June 17, 2013
+
++ Refactoring of BFS code and added integration tests
++ Created wikipedia.graph package for Wikipedia graph manipulation classes
++ Added class for extracting anchor text from Wikipedia graph
+
+Version 1.4.15
+==============
+June 9, 2013
+
++ Improved Wikipedia collection handling
++ Updated Wikipedia collection APIs to new Hadoop API (org.apache.hadoop.mapreduce)
+
+Version 1.4.14
+==============
+April 30, 2013
+
++ Upgraded to CDH 4.2.1
++ Changed dependency to Maven artifacts for dsiutils, sux4j, fastutil, and spymemcached (as opposed to local jars)
+
+Version 1.4.13
+==============
+March 10, 2013
+
++ Added demo for learning Univariate Gaussian Mixture Models
++ Upgraded to CDH 4.2.0
+
+Version 1.4.12
+==============
+February 24, 2013
+
++ Added ability to read index and collection from HDFS in solutions to inverted indexing and boolean retrieval exercises
+
+Version 1.4.11
+==============
+February 17, 2013
+
++ More efficient comparators in Writable pairs
++ Refactored PageRank implementations, added proper arg parsing
++ Revamped documentation on reference implementations
++ Fixed broken integration tests
+
+Version 1.4.10
+==============
+February 6, 2013
+
++ Refactored cooccurrence matrix example, stripes implementation
++ Added integration test for webgraph
+
 Version 1.4.9
 =============
 February 1, 2013

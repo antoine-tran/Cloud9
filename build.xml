@@ -11,7 +11,7 @@
   <property name="test.junit.dir" location="${test.dir}/junit" />
   <property name="integration.dir" location="${test.dir}/integration" />
 
-  <property name="version" value="1.4.9"/>
+  <property name="version" value="1.5.0"/>
 
   <!-- paths used for compilation and run  -->
   <path id="lib.path.id">
@@ -25,6 +25,7 @@
     <fileset dir="${dist.dir}/" includes="cloud9*.jar"/>
     <fileset dir="${lib.dir}/" includes="guava*.jar"/>
     <fileset dir="${lib.dir}/" includes="fastutil*.jar"/>
+    <fileset dir="${lib.dir}/" includes="bliki*.jar"/>
   </path>
 
   <property name="maven.ant.task.version" value="2.1.2"/>
@@ -110,13 +111,13 @@
   </target>
 
   <target name="compile" depends="init,resolve" description="compile the source ">
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="UTF-8" classpathref="lib.path.id" srcdir="${src.dir}/dist" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="UTF-8" classpathref="lib.path.id" srcdir="${src.dir}/test" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
-    <javac classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on">
+    <javac encoding="UTF-8" classpathref="lib.path.id" srcdir="${src.dir}/integration" destdir="${build.dir}" optimize="on" debug="on">
       <compilerarg value="-Xlint:unchecked" />
     </javac>
     <copy todir="${build.dir}">
@@ -201,8 +202,8 @@
         <exclude name="edu/cmu/**/*.java" />
       </fileset>
       <link href="http://download.oracle.com/javase/6/docs/api/" />
-      <link href="http://hadoop.apache.org/common/docs/r0.20.1/api/" />
-      <link href="http://fastutil.dsi.unimi.it/docs/" />
+      <link href="http://hadoop.apache.org/docs/r2.0.3-alpha/api/" />
+      <!-- link href="http://fastutil.dsi.unimi.it/docs/" /-->
     </javadoc>
     <copy todir="${javadoc.dir}">
       <fileset dir="${src.dir}/dist">

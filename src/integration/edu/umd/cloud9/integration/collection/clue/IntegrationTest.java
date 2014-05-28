@@ -34,7 +34,14 @@ public class IntegrationTest {
   private static final String mappingFile = tmpPrefix + "-mapping.dat";
 
   @Test
-  public void testDocnoMapping() throws Exception {
+  public void runTests() throws Exception {
+    testDocnoMapping();
+    testDemoCountDocsRepacked();
+    testDemoCountDocsRaw();
+    testForwardIndex();
+  }
+
+  private void testDocnoMapping() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -42,7 +49,7 @@ public class IntegrationTest {
 
     String[] args = new String[] { "hadoop jar", IntegrationUtils.getJar("dist", "cloud9"),
         edu.umd.cloud9.collection.clue.ClueWarcDocnoMappingBuilder.class.getCanonicalName(),
-        "-libjars=" + IntegrationUtils.getJar("lib", "guava-13"),
+        "-libjars=" + IntegrationUtils.getJar("lib", "guava"),
         "-" + DocnoMapping.BuilderUtils.COLLECTION_OPTION + "=" + collectionPathRepacked,
         "-" + DocnoMapping.BuilderUtils.MAPPING_OPTION + "=" + mappingFile };
 
@@ -58,8 +65,7 @@ public class IntegrationTest {
     assertEquals(1000000, mapping.getDocno("clueweb09-en0000-29-13313"));
   }
 
-  @Test
-  public void testDemoCountDocsRepacked() throws Exception {
+  private void testDemoCountDocsRepacked() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -85,8 +91,7 @@ public class IntegrationTest {
     assertEquals(50220423, Integer.parseInt(str.toString()));
   }
 
-  @Test
-  public void testDemoCountDocsRaw() throws Exception {
+  private void testDemoCountDocsRaw() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
@@ -113,8 +118,7 @@ public class IntegrationTest {
     assertEquals(50220423, Integer.parseInt(str.toString()));
   }
 
-  @Test
-  public void testForwardIndex() throws Exception {
+  private void testForwardIndex() throws Exception {
     Configuration conf = IntegrationUtils.getBespinConfiguration();
     FileSystem fs = FileSystem.get(conf);
 
