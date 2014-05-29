@@ -96,7 +96,11 @@ public class WikipediaDocnoMapping implements DocnoMapping {
     for (int i = 0; i < n; i++) {
       reader.readLine(line);
       String[] arr = line.toString().split("\\t");
-      out.writeInt(Integer.parseInt(arr[0]));
+      try {
+    	  out.writeInt(Integer.parseInt(arr[0]));
+      } catch (NumberFormatException e) {
+    	  continue;
+      }
       cnt++;
       if (cnt % 100000 == 0) {
         LOG.info(cnt + " articles");
