@@ -48,169 +48,171 @@ import edu.umd.cloud9.collection.wikipedia.language.WikipediaPageFactory;
  * @author Peter Exner
  */
 public class RepackWikipedia extends Configured implements Tool {
-  private static final Logger LOG = Logger.getLogger(RepackWikipedia.class);
+	private static final Logger LOG = Logger.getLogger(RepackWikipedia.class);
 
-  private static enum Records { TOTAL };
+	private static enum Records { TOTAL };
 
-  private static class MyMapper extends 
-      Mapper<LongWritable, WikipediaPage, IntWritable, WikipediaPage> {
-    private static final IntWritable docno = new IntWritable();
-    private static final WikipediaDocnoMapping docnoMapping = new WikipediaDocnoMapping();
-    
-    @Override
-    public void setup(Context context) {
-      try {
-        Path p = new Path(context.getConfiguration().get(DOCNO_MAPPING_FIELD));
-        LOG.info("Loading docno mapping: " + p);
+	private static class MyMapper extends 
+	Mapper<LongWritable, WikipediaPage, IntWritable, WikipediaPage> {
+		private static final IntWritable docno = new IntWritable();
+		private static final WikipediaDocnoMapping docnoMapping = new WikipediaDocnoMapping();
 
-        FileSystem fs = FileSystem.get(context.getConfiguration());
-        if (!fs.exists(p)) {
-          throw new RuntimeException(p + " does not exist!");
-        }
+		@Override
+		public void setup(Context context) {
+			try {
+				Path p = new Path(context.getConfiguration().get(DOCNO_MAPPING_FIELD));
+				LOG.info("Loading docno mapping: " + p);
 
-        docnoMapping.loadMapping(p, fs);
-      } catch (Exception e) {
-        throw new RuntimeException("Error loading docno mapping data file!");
-      }
-    }
+				FileSystem fs = FileSystem.get(context.getConfiguration());
+				if (!fs.exists(p)) {
+					throw new RuntimeException(p + " does not exist!");
+				}
 
-    @Override
-    public void map(LongWritable key, WikipediaPage doc, Context context)
-        throws IOException, InterruptedException {
-      context.getCounter(Records.TOTAL).increment(1);
-      String id = doc.getDocid();
-      if (id != null) {
-        // We're going to discard pages that aren't in the docno mapping.
-        int n = docnoMapping.getDocno(id);
-        if (n >= 0) {
-          docno.set(n);
+				docnoMapping.loadMapping(p, fs);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("Error loading docno mapping data file!");
 
-          context.write(docno, doc);
-        }
-      }
-    }
-  }
+			}
+		}
 
-  private static final String DOCNO_MAPPING_FIELD = "DocnoMappingDataFile";
+		@Override
+		public void map(LongWritable key, WikipediaPage doc, Context context)
+				throws IOException, InterruptedException {
+			context.getCounter(Records.TOTAL).increment(1);
+			String id = doc.getDocid();
+			if (id != null) {
+				// We're going to discard pages that aren't in the docno mapping.
+				int n = docnoMapping.getDocno(id);
+				if (n >= 0) {
+					docno.set(n);
 
-  private static final String INPUT_OPTION = "input";
-  private static final String OUTPUT_OPTION = "output";
-  private static final String MAPPING_FILE_OPTION = "mapping_file";
-  private static final String COMPRESSION_TYPE_OPTION = "compression_type";
-  private static final String LANGUAGE_OPTION = "wiki_language";
+					context.write(docno, doc);
+				}
+			}
+		}
+	}
 
-  @SuppressWarnings("static-access") @Override
-  public int run(String[] args) throws Exception {
-    Options options = new Options();
-    options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("XML dump file").create(INPUT_OPTION));
-    options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("output location").create(OUTPUT_OPTION));
-    options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("mapping file").create(MAPPING_FILE_OPTION));
-    options.addOption(OptionBuilder.withArgName("block|record|none").hasArg()
-        .withDescription("compression type").create(COMPRESSION_TYPE_OPTION));
-    options.addOption(OptionBuilder.withArgName("en|sv|de").hasArg()
-        .withDescription("two-letter language code").create(LANGUAGE_OPTION));
+	private static final String DOCNO_MAPPING_FIELD = "DocnoMappingDataFile";
 
-    CommandLine cmdline;
-    CommandLineParser parser = new GnuParser();
-    try {
-      cmdline = parser.parse(options, args);
-    } catch (ParseException exp) {
-      System.err.println("Error parsing command line: " + exp.getMessage());
-      return -1;
-    }
+	private static final String INPUT_OPTION = "input";
+	private static final String OUTPUT_OPTION = "output";
+	private static final String MAPPING_FILE_OPTION = "mapping_file";
+	private static final String COMPRESSION_TYPE_OPTION = "compression_type";
+	private static final String LANGUAGE_OPTION = "wiki_language";
 
-    if (!cmdline.hasOption(INPUT_OPTION) || !cmdline.hasOption(OUTPUT_OPTION) ||
-        !cmdline.hasOption(MAPPING_FILE_OPTION) || !cmdline.hasOption(COMPRESSION_TYPE_OPTION)) {
-      HelpFormatter formatter = new HelpFormatter();
-      formatter.printHelp(this.getClass().getName(), options);
-      ToolRunner.printGenericCommandUsage(System.out);
-      return -1;
-    }
+	@SuppressWarnings("static-access") @Override
+	public int run(String[] args) throws Exception {
+		Options options = new Options();
+		options.addOption(OptionBuilder.withArgName("path").hasArg()
+				.withDescription("XML dump file").create(INPUT_OPTION));
+		options.addOption(OptionBuilder.withArgName("path").hasArg()
+				.withDescription("output location").create(OUTPUT_OPTION));
+		options.addOption(OptionBuilder.withArgName("path").hasArg()
+				.withDescription("mapping file").create(MAPPING_FILE_OPTION));
+		options.addOption(OptionBuilder.withArgName("block|record|none").hasArg()
+				.withDescription("compression type").create(COMPRESSION_TYPE_OPTION));
+		options.addOption(OptionBuilder.withArgName("en|sv|de").hasArg()
+				.withDescription("two-letter language code").create(LANGUAGE_OPTION));
 
-    String inputPath = cmdline.getOptionValue(INPUT_OPTION);
-    String outputPath = cmdline.getOptionValue(OUTPUT_OPTION);
-    String mappingFile = cmdline.getOptionValue(MAPPING_FILE_OPTION);
-    String compressionType = cmdline.getOptionValue(COMPRESSION_TYPE_OPTION);
+		CommandLine cmdline;
+		CommandLineParser parser = new GnuParser();
+		try {
+			cmdline = parser.parse(options, args);
+		} catch (ParseException exp) {
+			System.err.println("Error parsing command line: " + exp.getMessage());
+			return -1;
+		}
 
-    if (!"block".equals(compressionType) && !"record".equals(compressionType) && !"none".equals(compressionType)) {
-      System.err.println("Error: \"" + compressionType + "\" unknown compression type!");
-      return -1;
-    }
+		if (!cmdline.hasOption(INPUT_OPTION) || !cmdline.hasOption(OUTPUT_OPTION) ||
+				!cmdline.hasOption(MAPPING_FILE_OPTION) || !cmdline.hasOption(COMPRESSION_TYPE_OPTION)) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp(this.getClass().getName(), options);
+			ToolRunner.printGenericCommandUsage(System.out);
+			return -1;
+		}
 
-    String language = null;
-    if (cmdline.hasOption(LANGUAGE_OPTION)) {
-      language = cmdline.getOptionValue(LANGUAGE_OPTION);
-      if(language.length()!=2){
-        System.err.println("Error: \"" + language + "\" unknown language!");
-        return -1;
-      }
-    }
+		String inputPath = cmdline.getOptionValue(INPUT_OPTION);
+		String outputPath = cmdline.getOptionValue(OUTPUT_OPTION);
+		String mappingFile = cmdline.getOptionValue(MAPPING_FILE_OPTION);
+		String compressionType = cmdline.getOptionValue(COMPRESSION_TYPE_OPTION);
 
-    // this is the default block size
-    int blocksize = 1000000;
+		if (!"block".equals(compressionType) && !"record".equals(compressionType) && !"none".equals(compressionType)) {
+			System.err.println("Error: \"" + compressionType + "\" unknown compression type!");
+			return -1;
+		}
 
-    Job job = Job.getInstance(getConf());
-    job.setJarByClass(RepackWikipedia.class);
-    job.setJobName(String.format("RepackWikipedia[%s: %s, %s: %s, %s: %s, %s: %s]",
-        INPUT_OPTION, inputPath, OUTPUT_OPTION, outputPath, COMPRESSION_TYPE_OPTION,
-        compressionType, LANGUAGE_OPTION, language));
+		String language = null;
+		if (cmdline.hasOption(LANGUAGE_OPTION)) {
+			language = cmdline.getOptionValue(LANGUAGE_OPTION);
+			if(language.length()!=2){
+				System.err.println("Error: \"" + language + "\" unknown language!");
+				return -1;
+			}
+		}
 
-    job.getConfiguration().set(DOCNO_MAPPING_FIELD, mappingFile);
+		// this is the default block size
+		int blocksize = 1000000;
 
-    LOG.info("Tool name: " + this.getClass().getName());
-    LOG.info(" - XML dump file: " + inputPath);
-    LOG.info(" - output path: " + outputPath);
-    LOG.info(" - docno mapping data file: " + mappingFile);
-    LOG.info(" - compression type: " + compressionType);
-    LOG.info(" - language: " + language);
+		Job job = Job.getInstance(getConf());
+		job.setJarByClass(RepackWikipedia.class);
+		job.setJobName(String.format("RepackWikipedia[%s: %s, %s: %s, %s: %s, %s: %s]",
+				INPUT_OPTION, inputPath, OUTPUT_OPTION, outputPath, COMPRESSION_TYPE_OPTION,
+				compressionType, LANGUAGE_OPTION, language));
 
-    if ("block".equals(compressionType)) {
-      LOG.info(" - block size: " + blocksize);
-    }
+		job.getConfiguration().set(DOCNO_MAPPING_FIELD, mappingFile);
 
-    job.setNumReduceTasks(0);
+		LOG.info("Tool name: " + this.getClass().getName());
+		LOG.info(" - XML dump file: " + inputPath);
+		LOG.info(" - output path: " + outputPath);
+		LOG.info(" - docno mapping data file: " + mappingFile);
+		LOG.info(" - compression type: " + compressionType);
+		LOG.info(" - language: " + language);
 
-    SequenceFileInputFormat.addInputPath(job, new Path(inputPath));
-    SequenceFileOutputFormat.setOutputPath(job, new Path(outputPath));
+		if ("block".equals(compressionType)) {
+			LOG.info(" - block size: " + blocksize);
+		}
 
-    if ("none".equals(compressionType)) {
-      SequenceFileOutputFormat.setCompressOutput(job, false);
-    } else {
-      SequenceFileOutputFormat.setCompressOutput(job, true);
+		job.setNumReduceTasks(0);
 
-      if ("record".equals(compressionType)) {
-        SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.RECORD);
-      } else {
-        SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.BLOCK);
-        job.getConfiguration().setInt("io.seqfile.compress.blocksize", blocksize);
-      }
-    }
+		SequenceFileInputFormat.addInputPath(job, new Path(inputPath));
+		SequenceFileOutputFormat.setOutputPath(job, new Path(outputPath));
 
-    if (language != null) {
-      job.getConfiguration().set("wiki.language", language);
-    }
+		if ("none".equals(compressionType)) {
+			SequenceFileOutputFormat.setCompressOutput(job, false);
+		} else {
+			SequenceFileOutputFormat.setCompressOutput(job, true);
 
-    job.setInputFormatClass(WikipediaPageInputFormat.class);
-    job.setOutputFormatClass(SequenceFileOutputFormat.class);
-    job.setOutputKeyClass(IntWritable.class);
-    job.setOutputValueClass(WikipediaPageFactory.getWikipediaPageClass(language));
+			if ("record".equals(compressionType)) {
+				SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.RECORD);
+			} else {
+				SequenceFileOutputFormat.setOutputCompressionType(job, SequenceFile.CompressionType.BLOCK);
+				job.getConfiguration().setInt("io.seqfile.compress.blocksize", blocksize);
+			}
+		}
 
-    job.setMapperClass(MyMapper.class);
+		if (language != null) {
+			job.getConfiguration().set("wiki.language", language);
+		}
 
-    // Delete the output directory if it exists already.
-    FileSystem.get(getConf()).delete(new Path(outputPath), true);
+		job.setInputFormatClass(WikipediaPageInputFormat.class);
+		job.setOutputFormatClass(SequenceFileOutputFormat.class);
+		job.setOutputKeyClass(IntWritable.class);
+		job.setOutputValueClass(WikipediaPageFactory.getWikipediaPageClass(language));
 
-    job.waitForCompletion(true);
+		job.setMapperClass(MyMapper.class);
 
-    return 0;
-  }
+		// Delete the output directory if it exists already.
+		FileSystem.get(getConf()).delete(new Path(outputPath), true);
 
-  public RepackWikipedia() {}
+		job.waitForCompletion(true);
 
-  public static void main(String[] args) throws Exception {
-    ToolRunner.run(new RepackWikipedia(), args);
-  }
+		return 0;
+	}
+
+	public RepackWikipedia() {}
+
+	public static void main(String[] args) throws Exception {
+		ToolRunner.run(new RepackWikipedia(), args);
+	}
 }

@@ -31,6 +31,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.MapFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -41,7 +42,6 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.MapFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
@@ -58,7 +58,8 @@ import edu.umd.cloud9.io.pair.PairOfStrings;
  * 
  * @author Jimmy Lin
  * 
- * @since 29.05.2014 - Tuan: Refactor to the new mapreduce framework, and add support for text output
+ * @since 29.05.2014 - Tuan: Refactor to the new mapreduce framework
+ * TODO: Add support for text output (29.05.2014)
  */
 public class ExtractWikipediaAnchorText extends Configured implements Tool {
 	private static final Logger LOG = Logger.getLogger(ExtractWikipediaAnchorText.class);
@@ -194,6 +195,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 
 	private static final String INPUT_OPTION = "input";
 	private static final String OUTPUT_OPTION = "output";
+	private static final String REDIR_OPTION = "redirect";
 
 	@SuppressWarnings("static-access")
 	@Override
@@ -201,6 +203,8 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 		Options options = new Options();
 		options.addOption(OptionBuilder.withArgName("path").hasArg()
 				.withDescription("input").create(INPUT_OPTION));
+		options.addOption(OptionBuilder.withArgName("redirect").hasArg()
+				.withDescription("redirect option").create(REDIR_OPTION));
 		options.addOption(OptionBuilder.withArgName("path").hasArg()
 				.withDescription("output for adjacency list").create(OUTPUT_OPTION));
 
@@ -224,7 +228,15 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 		String tmp = "tmp-" + this.getClass().getCanonicalName() + "-" + random.nextInt(10000);
 
 		task1(cmdline.getOptionValue(INPUT_OPTION), tmp);
-		task2(tmp, cmdline.getOptionValue(OUTPUT_OPTION));
+		
+		if (!cmdline.hasOption(REDIR_OPTION)) {
+			task2(tmp, cmdline.getOptionValue(OUTPUT_OPTION));
+		}
+		else {
+			String tmp2 = "tmp-" + this.getClass().getCanonicalName() + "-" + random.nextInt(10000);
+			task2(tmp, tmp2);
+			task3(tmp2,cmdline.getOptionValue(REDIR_OPTION),cmdline.getOptionValue(OUTPUT_OPTION));
+		}
 
 		return 0;
 	}
@@ -303,6 +315,50 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 		
 		// Clean up intermediate data.
 		FileSystem.get(conf.getConfiguration()).delete(new Path(inputPath), true);
+	}
+	
+	// resolve the redirect
+	private void task3(String inputPath, String redirectPath, String outputPath) throws IOException {
+		
+		// caches
+		IntWritable mapKey = new IntWritable();
+		HMapSIW mapVal = new HMapSIW();
+		HMapSIW tmpMap = new HMapSIW();
+		IntWritable target = new IntWritable(0);
+		
+		// read the redirect file
+		MapFile.Reader redirectReader = null;
+		MapFile.Writer mapWriter = null;
+		MapFile.Reader mapReader = null;
+		
+		try {
+			mapReader = new MapFile.Reader(new Path(inputPath + "/part-r-00000"), getConf());
+
+			redirectReader = new MapFile.Reader(new Path(redirectPath + "/part-r-00000"), getConf());
+
+			
+			mapWriter = new MapFile.Writer(getConf(), new Path(outputPath));
+			
+			while(mapReader.next(mapKey, mapVal)) {
+				redirectReader.get(mapKey, target);
+				if (target.get() > 0) {
+					mapReader.get(target, tmpMap);
+					if (!tmpMap.isEmpty()) {
+						tmpMap.putAll(mapVal);
+						mapWriter.append(target, tmpMap);
+					}
+				} else {
+					mapWriter.append(mapKey, mapVal);
+				}
+			}
+		} finally {
+			if (mapWriter != null) mapWriter.close();
+			if (mapReader != null) mapReader.close();
+			if (redirectReader != null) redirectReader.close();
+			
+			// Clean up intermediate data.
+			FileSystem.get(getConf()).delete(new Path(inputPath), true);
+		}
 	}
 
 	public ExtractWikipediaAnchorText() {}
