@@ -122,7 +122,7 @@ public class WikipediaDocnoMapping implements DocnoMapping {
     FSDataInputStream in = fs.open(p);
 
     // docnos start at one, so we need an array that's one larger than number of docs.
-    int sz = in.readInt() + 1;
+    int sz = in.readInt();
     int[] arr = new int[sz];
 
     for (int i = 1; i < sz; i++) {

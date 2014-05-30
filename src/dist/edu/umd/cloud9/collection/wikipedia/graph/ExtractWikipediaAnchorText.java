@@ -124,27 +124,31 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 	}
 
 	private static class MyReducer1 extends Reducer<PairOfStringInt, 
-			PairOfStrings, IntWritable, PairOfIntString> {
+	PairOfStrings, IntWritable, PairOfIntString> {
 		private static final IntWritable SRCID = new IntWritable();
 		private static final PairOfIntString TARGET_ANCHOR_PAIR 
-				= new PairOfIntString();
+		= new PairOfIntString();
 
 		private String targetTitle;
 		private int targetDocid;
 
-		public void reduce(PairOfStringInt key, Iterator<PairOfStrings> values,
+
+
+		public void reduce(PairOfStringInt key, Iterable<PairOfStrings> values,
 				Context context) throws IOException, InterruptedException {
 
 			if (key.getRightElement() == 0) {
 				targetTitle = key.getLeftElement();
-				targetDocid = Integer.parseInt(values.next().getLeftElement());
+				for (PairOfStrings pair : values) {
+					targetDocid = Integer.parseInt(pair.getLeftElement());
+					break;
+				}
 			} else {
 				if (!key.getLeftElement().equals(targetTitle)) {
 					return;
 				}
 
-				while (values.hasNext()) {
-					PairOfStrings pair = values.next();
+				for (PairOfStrings pair : values) {
 					SRCID.set(Integer.parseInt(pair.getLeftElement()));
 					TARGET_ANCHOR_PAIR.set(targetDocid, pair.getRightElement());
 
@@ -161,7 +165,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 	}
 
 	private static class MyMapper2 extends Mapper<IntWritable, PairOfIntString,
-			IntWritable, Text> {
+	IntWritable, Text> {
 		private static final IntWritable KEY = new IntWritable();
 		private static final Text VALUE = new Text();
 
@@ -175,7 +179,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 	}
 
 	private static class MyReducer2 extends Reducer<IntWritable,
-			Text, IntWritable, HMapSIW> {
+	Text, IntWritable, HMapSIW> {
 		private static final HMapSIW map = new HMapSIW();
 
 		public void reduce(IntWritable key, Iterator<Text> values, Context context)
@@ -228,7 +232,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 		String tmp = "tmp-" + this.getClass().getCanonicalName() + "-" + random.nextInt(10000);
 
 		task1(cmdline.getOptionValue(INPUT_OPTION), tmp);
-		
+
 		if (!cmdline.hasOption(REDIR_OPTION)) {
 			task2(tmp, cmdline.getOptionValue(OUTPUT_OPTION));
 		}
@@ -242,7 +246,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 	}
 
 	private void task1(String inputPath, String outputPath) throws IOException,
-			ClassNotFoundException, InterruptedException {
+	ClassNotFoundException, InterruptedException {
 		LOG.info("Exracting anchor text (phase 1)...");
 		LOG.info(" - input: " + inputPath);
 		LOG.info(" - output: " + outputPath);
@@ -279,7 +283,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 	}
 
 	private void task2(String inputPath, String outputPath) throws IOException, 
-			ClassNotFoundException, InterruptedException {
+	ClassNotFoundException, InterruptedException {
 		LOG.info("Exracting anchor text (phase 2)...");
 		LOG.info(" - input: " + inputPath);
 		LOG.info(" - output: " + outputPath);
@@ -312,33 +316,32 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 		FileSystem.get(conf.getConfiguration()).delete(new Path(outputPath), true);
 
 		conf.waitForCompletion(true);
-		
+
 		// Clean up intermediate data.
 		FileSystem.get(conf.getConfiguration()).delete(new Path(inputPath), true);
 	}
-	
+
 	// resolve the redirect
 	private void task3(String inputPath, String redirectPath, String outputPath) throws IOException {
-		
+
 		// caches
 		IntWritable mapKey = new IntWritable();
 		HMapSIW mapVal = new HMapSIW();
 		HMapSIW tmpMap = new HMapSIW();
 		IntWritable target = new IntWritable(0);
-		
+
 		// read the redirect file
 		MapFile.Reader redirectReader = null;
 		MapFile.Writer mapWriter = null;
 		MapFile.Reader mapReader = null;
-		
+
 		try {
 			mapReader = new MapFile.Reader(new Path(inputPath + "/part-r-00000"), getConf());
 
-			redirectReader = new MapFile.Reader(new Path(redirectPath + "/part-r-00000"), getConf());
+			redirectReader = new MapFile.Reader(new Path(redirectPath), getConf());
 
-			
 			mapWriter = new MapFile.Writer(getConf(), new Path(outputPath));
-			
+
 			while(mapReader.next(mapKey, mapVal)) {
 				redirectReader.get(mapKey, target);
 				if (target.get() > 0) {
@@ -355,7 +358,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 			if (mapWriter != null) mapWriter.close();
 			if (mapReader != null) mapReader.close();
 			if (redirectReader != null) redirectReader.close();
-			
+
 			// Clean up intermediate data.
 			FileSystem.get(getConf()).delete(new Path(inputPath), true);
 		}

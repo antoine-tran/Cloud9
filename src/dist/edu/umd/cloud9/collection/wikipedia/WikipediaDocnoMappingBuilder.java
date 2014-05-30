@@ -35,6 +35,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -56,7 +57,7 @@ public class WikipediaDocnoMappingBuilder extends Configured implements Tool, Do
 	private static final Random RANDOM = new Random();
 
 	private static enum PageTypes {
-		TOTAL, REDIRECT, DISAMBIGUATION, EMPTY, ARTICLE, STUB, NON_ARTICLE, OTHER
+		TOTAL, REDIRECT, DISAMBIGUATION, EMPTY, ARTICLE, STUB, NON_ARTICLE, OTHER, WRITTEN
 	};
 
 	private static class MyMapper extends Mapper<LongWritable, WikipediaPage, IntWritable, IntWritable> {
@@ -115,16 +116,17 @@ public class WikipediaDocnoMappingBuilder extends Configured implements Tool, Do
 		private final static IntWritable cnt = new IntWritable(1);
 
 		@Override
+		protected void setup(Context context) throws IOException,
+				InterruptedException {
+			context.getCounter(PageTypes.WRITTEN).setValue(1);
+		}
+
+		@Override
 		public void reduce(IntWritable key, Iterable<IntWritable> values, Context context)
 				throws IOException, InterruptedException {
 			context.write(key, cnt);
 			cnt.set(cnt.get() + 1);
-		}
-
-		@Override
-		protected void cleanup(Context context)
-				throws IOException, InterruptedException {
-			context.getConfiguration().setLong("total.added", cnt.get());
+			context.getCounter(PageTypes.WRITTEN).increment(1);
 		}
 	}
 
@@ -223,7 +225,7 @@ public class WikipediaDocnoMappingBuilder extends Configured implements Tool, Do
 		job.waitForCompletion(true);
 		/*long cnt = keepAll ? job.getCounters().findCounter(PageTypes.TOTAL).getValue() :
 			job.getCounters().findCounter(PageTypes.ARTICLE).getValue();*/
-		long cnt = job.getConfiguration().getLong("total.added", 0);
+		long cnt = job.getCounters().findCounter(PageTypes.WRITTEN).getValue();
 
 		WikipediaDocnoMapping.writeDocnoMappingData(FileSystem.get(getConf()),
 				tmpPath + "/part-r-00000", (int) cnt, outputFile);
