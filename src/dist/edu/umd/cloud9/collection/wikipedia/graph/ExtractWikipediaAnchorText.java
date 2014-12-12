@@ -17,7 +17,6 @@
 package edu.umd.cloud9.collection.wikipedia.graph;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Random;
 
 import org.apache.commons.cli.CommandLine;
@@ -182,14 +181,11 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 	Text, IntWritable, HMapSIW> {
 		private static final HMapSIW map = new HMapSIW();
 
-		public void reduce(IntWritable key, Iterator<Text> values, Context context)
+		public void reduce(IntWritable key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
 			map.clear();
 
-			Text cur;
-			while (values.hasNext()) {
-				cur = values.next();
-
+			for (Text cur : values) {
 				map.increment(cur.toString());
 			}
 
@@ -340,12 +336,14 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 
 			redirectReader = new MapFile.Reader(new Path(redirectPath), getConf());
 
-			mapWriter = new MapFile.Writer(getConf(), new Path(outputPath));
+			mapWriter = new MapFile.Writer(getConf(), new Path(outputPath), 
+					MapFile.Writer.keyClass(IntWritable.class),
+					MapFile.Writer.valueClass(HMapSIW.class));
 
 			while(mapReader.next(mapKey, mapVal)) {
 				redirectReader.get(mapKey, target);
 				if (target.get() > 0) {
-					mapReader.get(target, tmpMap);
+					mapReader.get(target, tmpMap);	
 					if (!tmpMap.isEmpty()) {
 						tmpMap.putAll(mapVal);
 						mapWriter.append(target, tmpMap);

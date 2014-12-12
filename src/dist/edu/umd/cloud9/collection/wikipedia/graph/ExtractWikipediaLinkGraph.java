@@ -63,7 +63,7 @@ public class ExtractWikipediaLinkGraph extends Configured implements Tool {
   private static enum PageTypes { TOTAL, REDIRECT, DISAMBIGUATION, EMPTY, ARTICLE, STUB, NON_ARTICLE };
 
   private static enum GraphInfo { TOTAL_VERTICES, VERTICES_WITH_OUTLINKS, EDGES };
-
+  
   private static class MyMapper1 extends MapReduceBase implements
       Mapper<IntWritable, WikipediaPage, PairOfStringInt, Text> {
     private static Text text = new Text();
