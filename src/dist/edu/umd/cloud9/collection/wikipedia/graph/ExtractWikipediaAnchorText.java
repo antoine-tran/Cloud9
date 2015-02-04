@@ -336,6 +336,7 @@ public class ExtractWikipediaAnchorText extends Configured implements Tool {
 
 			redirectReader = new MapFile.Reader(new Path(redirectPath), getConf());
 
+			// TODO: Change code here
 			mapWriter = new MapFile.Writer(getConf(), new Path(outputPath), 
 					MapFile.Writer.keyClass(IntWritable.class),
 					MapFile.Writer.valueClass(HMapSIW.class));
