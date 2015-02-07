@@ -351,14 +351,70 @@ public abstract class WikipediaPage extends Indexable {
 		private String context;
 		private int start, end;
 
-		private ContextedLink(String anchor, String target) {
+		public ContextedLink(String anchor, String target) {
 			this.anchor = anchor;
 			this.target = target;
 		}
 
-		private ContextedLink(String anchor, String target, String context) {
+		public ContextedLink(String anchor, String target, String context) {
 			this.anchor = anchor;
 			this.target = target;
+			this.context = context;
+		}
+		
+		/**
+		 * @return the anchor
+		 */
+		public String getAnchor() {
+			return anchor;
+		}
+
+		/**
+		 * @param anchor the anchor to set
+		 */
+		public void setAnchor(String anchor) {
+			this.anchor = anchor;
+		}
+
+		/**
+		 * @return the start
+		 */
+		public int getStart() {
+			return start;
+		}
+
+		/**
+		 * @param start the start to set
+		 */
+		public void setStart(int start) {
+			this.start = start;
+		}
+
+		/**
+		 * @return the end
+		 */
+		public int getEnd() {
+			return end;
+		}
+
+		/**
+		 * @param end the end to set
+		 */
+		public void setEnd(int end) {
+			this.end = end;
+		}
+
+		/**
+		 * @param target the target to set
+		 */
+		public void setTarget(String target) {
+			this.target = target;
+		}
+
+		/**
+		 * @param context the context to set
+		 */
+		public void setContext(String context) {
 			this.context = context;
 		}
 
