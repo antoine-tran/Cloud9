@@ -201,6 +201,8 @@ public class RepackWikipedia extends Configured implements Tool {
 		job.setOutputValueClass(WikipediaPageFactory.getWikipediaPageClass(language));
 
 		job.setMapperClass(MyMapper.class);
+		
+		// job.setNumReduceTasks(1);
 
 		// Delete the output directory if it exists already.
 		FileSystem.get(getConf()).delete(new Path(outputPath), true);

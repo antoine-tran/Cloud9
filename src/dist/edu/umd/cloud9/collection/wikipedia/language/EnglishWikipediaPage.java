@@ -71,7 +71,7 @@ public class EnglishWikipediaPage extends WikipediaPage {
     this.textEnd = s.indexOf(XML_END_TAG_TEXT, this.textStart);
 
     // determine if article is a disambiguation, redirection, and/or stub page.
-    Matcher matcher = disambPattern.matcher(page);
+    Matcher matcher = disambPattern.matcher(title);
     this.isDisambig = matcher.find();
     this.isRedirect = s.substring(this.textStart + XML_START_TAG_TEXT.length(), this.textStart + XML_START_TAG_TEXT.length() + IDENTIFIER_REDIRECTION_UPPERCASE.length()).compareTo(IDENTIFIER_REDIRECTION_UPPERCASE) == 0 ||
                       s.substring(this.textStart + XML_START_TAG_TEXT.length(), this.textStart + XML_START_TAG_TEXT.length() + IDENTIFIER_REDIRECTION_LOWERCASE.length()).compareTo(IDENTIFIER_REDIRECTION_LOWERCASE) == 0;

@@ -41,7 +41,7 @@ import org.apache.log4j.Logger;
 
 /**
  * Tool for taking a Wikipedia XML dump file and spits out articles in a flat text file (article
- * title and content, separated by a tab).
+ * title and content, separated by a tab). disambiguation
  *
  * @author Jimmy Lin
  * @author Peter Exner
